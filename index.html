@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的工作台</title>
+<meta name="theme-color" content="#a78bfa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="工作台">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+html,body{-webkit-tap-highlight-color:transparent;overflow:hidden;height:100%;}
+.sidebar{background:#f5f3ff;transition:width .2s;}
+.sidebar-item{transition:background .15s;}
+.sidebar-item.active{background:#ede9fe;color:#7c3aed;}
+.sidebar-item:hover{background:#f3e8ff;}
+.main-panel{background:linear-gradient(180deg,#f0f9ff,#fdf2f8 45%,#f0fdf4 100%);}
+.panel-section{animation:fade .25s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.card{background:#fff;border-radius:18px;box-shadow:0 2px 10px rgba(139,92,246,.05);border:1px solid #f3e8ff;}
+.check-circle{width:76px;height:76px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease;border:2px solid #ddd6fe;background:#faf5ff;position:relative;}
+.check-circle:active{transform:scale(.92);}
+.check-circle.done{background:linear-gradient(135deg,#ede9fe,#ddd6fe);border-color:#c4b5fd;box-shadow:0 4px 12px rgba(196,181,253,.25);}
+.check-circle .check-emoji{font-size:24px;}
+.check-circle.done .check-emoji{display:none;}
+.check-circle .check-done{font-size:24px;display:none;}
+.check-circle.done .check-done{display:block;}
+.progress-track{background:#ede9fe;}
+input[type=range]{-webkit-appearance:none;height:5px;border-radius:5px;background:#d9f99d;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#65a30d;box-shadow:0 1px 4px rgba(101,163,13,.3);cursor:pointer;border:2px solid #fff;}
+.modal-bg{background:rgba(167,139,250,.18);backdrop-filter:blur(4px);}
+textarea{resize:none;}
+.diary-tag-success{background:#fef9c3;color:#854d0e;}
+.diary-tag-gratitude{background:#dcfce7;color:#166534;}
+.diary-tag-zhiji{background:#e9d5ff;color:#5b21b6;}
+.diary-tag-notes{background:#dbeafe;color:#1e40af;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:2px;}
+.diary-line{display:flex;align-items:baseline;border-bottom:1px solid #f3e8ff;min-height:42px;padding:0;position:relative;}
+.diary-line:hover{background:#faf5ff;}
+.diary-line:hover .delete-btn{display:flex;}
+.diary-num{flex-shrink:0;width:36px;padding:10px 6px 10px 14px;font-size:14px;color:#a78bfa;font-weight:600;}
+.diary-tag{flex-shrink:0;padding:10px 4px;}
+.diary-tag span{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;}
+.diary-text{flex:1;padding:10px 14px 10px 6px;font-size:13px;color:#334155;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.diary-time{flex-shrink:0;padding:10px 14px 10px 4px;font-size:10px;color:#c4b5fd;}
+.bottom-tabs{display:none;}
+@media(max-width:767px){.sidebar-desktop{display:none!important;}.bottom-tabs{display:flex!important;}.main-panel{margin-bottom:54px;}}
+.date-nav{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid #f3e8ff;background:#faf5ff;color:#8b5cf6;transition:background .15s;}
+.date-nav:hover{background:#ede9fe;}
+.ex-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.ex-chip-on{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;}
+.ex-chip-off{background:#f0fdf4;color:#65a30d;border:1px solid #d9f99d;}
+.delete-btn{display:none;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;transition:all .15s;position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#ef4444;background:#fef2f2;}
+.delete-btn:hover{background:#fecaca;}
+.delete-btn-small{width:20px;height:20px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;transition:all .15s;color:#ef4444;background:#fef2f2;margin-left:4px;}
+.delete-btn-small:hover{background:#fecaca;}
+.item-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #f3e8ff;transition:background .15s;position:relative;}
+.item-row:last-child{border-bottom:none;}
+.item-row:hover{background:#faf5ff;}
+.item-row:hover .delete-btn{display:flex;}
+.notes-item{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:8px;box-shadow:0 1px 4px rgba(139,92,246,.05);border:1px solid #f3e8ff;position:relative;transition:all .15s;}
+.notes-item:hover{background:#faf5ff;box-shadow:0 2px 8px rgba(139,92,246,.1);}
+.notes-item:hover .delete-btn{display:flex;}
+.notes-text{font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+.notes-meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:#a78bfa;}
+.notes-tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:500;}
+.notes-tag.quote{background:#dbeafe;color:#1e40af;}
+.notes-tag.inspiration{background:#fce7f3;color:#be185d;}
+.ex-record-card{background:#f0fdf4;border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;border:1px solid #bbf7d0;}
+.ex-record-card.ex-rest{background:#fefce8;border-color:#fef08a;}
+.ex-record-text{color:#166534;font-size:13px;}
+.read-record{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#fffbeb;border-radius:10px;margin-bottom:6px;border:1px solid #fde68a;}
+</style>
+</head>
+<body class="font-sans text-slate-700 h-full">
+
+<div class="flex h-full">
+<nav class="sidebar-desktop sidebar w-[200px] flex-shrink-0 flex flex-col border-r border-violet-100 overflow-y-auto">
+  <div class="px-5 pt-5 pb-3"><h1 class="text-lg font-bold text-violet-500">工作台</h1><div id="todayDateSidebar" class="text-xs text-violet-300 mt-1"></div></div>
+  <div class="flex-1 px-2 space-y-1" id="navList">
+    <button class="sidebar-item active w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium" data-panel="overview"><span>📊</span><span>总览</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="checkin"><span>✅</span><span>每日打卡</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="exercise"><span>🏃</span><span>运动计划</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="study"><span>📖</span><span>学习追踪</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="diary"><span>✍️</span><span>写日记</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="notes"><span>📝</span><span>随笔</span></button>
+    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500" data-panel="history"><span>📋</span><span>历史记录</span></button>
+  </div>
+  <div class="px-5 pb-4 pt-3 border-t border-violet-100">
+    <div class="flex items-center justify-between text-sm"><span class="text-amber-500 font-medium">🔥 <span id="streakDays">0</span> 天</span><span class="font-bold text-violet-400" id="completionPct">0%</span></div>
+    <div class="mt-2 progress-track h-2 rounded-full overflow-hidden"><div id="completionBar" class="h-full bg-gradient-to-r from-violet-300 via-rose-300 to-amber-300 rounded-full transition-all duration-500" style="width:0%"></div></div>
+  </div>
+</nav>
+
+<main class="main-panel flex-1 overflow-y-auto" id="mainContent">
+
+  <!-- 总览 -->
+  <div id="panel-overview" class="panel-section p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-violet-400 mb-1">今日总览</h2>
+    <p id="todayDateMain" class="text-sm text-violet-300 mb-4"></p>
+    <div class="card p-4 mb-4">
+      <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-violet-400">完成度</span><span class="text-2xl font-bold text-violet-400" id="completionPctMain">0%</span></div>
+      <div class="progress-track h-3 rounded-full overflow-hidden"><div id="completionBarMain" class="h-full bg-gradient-to-r from-violet-300 via-rose-300 to-amber-300 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="miniSummary" class="flex flex-wrap gap-2 mt-3 text-xs"></div>
+    </div>
+    <div class="card p-4 mb-4">
+      <h3 class="text-sm font-semibold text-violet-400 mb-3">快速打卡</h3>
+      <div id="quickCheckGrid" class="flex flex-wrap justify-center gap-3"></div>
+    </div>
+    <div class="card p-4">
+      <h3 class="text-sm font-semibold text-violet-400 mb-2">今日状态</h3>
+      <div id="overviewStatus" class="space-y-1.5 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- 每日打卡 -->
+  <div id="panel-checkin" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-violet-400 mb-4">每日必做</h2>
+    <div class="flex items-center gap-3 mb-4">
+      <button class="date-nav" onclick="app.navCheck(-1)">←</button>
+      <span id="checkinDateDisplay" class="text-sm font-semibold text-violet-500"></span>
+      <button class="date-nav" onclick="app.navCheck(1)">→</button>
+      <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navCheckTo(todayStr())">今天</button>
+    </div>
+    <div id="checkinHistoryHint" class="mb-2 text-xs text-violet-300"></div>
+    <div id="checkProgress" class="text-sm text-violet-300 mb-3"></div>
+    <div id="checkGrid" class="flex flex-wrap justify-center gap-4"></div>
+    <div id="checkinRecords" class="mt-4"></div>
+  </div>
+
+  <!-- 运动计划 -->
+  <div id="panel-exercise" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-green-500 mb-4">今日运动</h2>
+    <div class="flex items-center gap-3 mb-4">
+      <button class="date-nav" onclick="app.navEx(-1)">←</button>
+      <span id="exDateDisplay" class="text-sm font-semibold text-green-500"></span>
+      <button class="date-nav" onclick="app.navEx(1)">→</button>
+      <button class="px-2 py-1 rounded-lg text-xs bg-green-50 text-green-400 border border-green-100 font-medium" onclick="app.navExTo(todayStr())">今天</button>
+    </div>
+    <div id="exHistoryHint" class="mb-2 text-xs text-green-300"></div>
+    <p class="text-xs text-green-300 mb-3" id="exHint">可多选，一天可做多项运动</p>
+    <div id="exTagList" class="flex flex-wrap gap-2 mb-4"></div>
+    <div id="exDetailArea" class="space-y-3"></div>
+    <div id="exRecordsArea" class="mt-3 space-y-2"></div>
+    <div id="weekExerciseStat" class="mt-4 text-sm text-green-300 font-medium"></div>
+    <div id="exMgmtArea" class="mt-6 pt-4 border-t border-green-100"></div>
+  </div>
+
+  <!-- 学习追踪 -->
+  <div id="panel-study" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-amber-400 mb-4">学习追踪</h2>
+    <div class="flex items-center gap-3 mb-4">
+      <button class="date-nav" onclick="app.navStudy(-1)">←</button>
+      <span id="studyDateDisplay" class="text-sm font-semibold text-amber-500"></span>
+      <button class="date-nav" onclick="app.navStudy(1)">→</button>
+      <button class="px-2 py-1 rounded-lg text-xs bg-amber-50 text-amber-400 border border-amber-100 font-medium" onclick="app.navStudyTo(todayStr())">今天</button>
+    </div>
+    <div id="studyHistoryHint" class="mb-2 text-xs text-amber-200"></div>
+    <div class="card p-4 mb-3">
+      <h3 class="text-sm font-semibold text-amber-400 mb-3">阅读</h3>
+      <div class="flex items-center gap-2 mb-3">
+        <input type="number" id="readMinutesInput" placeholder="分钟数" min="0" max="600" class="flex-1 px-3 py-2 rounded-lg border border-amber-100 text-sm focus:outline-none focus:border-amber-300">
+        <button class="px-3 py-2 rounded-lg bg-amber-100 text-amber-500 text-sm font-medium hover:bg-amber-200 transition" onclick="saveReadRecord()">记录</button>
+      </div>
+      <div class="flex items-center justify-between text-xs text-amber-300 mb-1"><span>每日目标</span><span><span id="readGoalDisplay">30</span> 分钟</span></div>
+      <input type="range" id="readGoalSlider" min="10" max="120" step="5" value="30" class="w-full" onchange="updateReadGoal(this.value)">
+      <div id="readRecordsList" class="mt-3"></div>
+    </div>
+    <div class="card p-4">
+      <h3 class="text-sm font-semibold text-amber-400 mb-3">多邻国</h3>
+      <button id="duoBtn" class="w-full py-3 rounded-xl text-sm font-medium transition" onclick="toggleDuo()">标记完成</button>
+      <div id="duoRecord" class="mt-3"></div>
+    </div>
+    <div id="weekStudyStat" class="mt-4 text-sm text-amber-300 font-medium"></div>
+  </div>
+
+  <!-- 写日记 -->
+  <div id="panel-diary" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-violet-400 mb-4">写日记</h2>
+    <div class="flex items-center gap-3 mb-4">
+      <button class="date-nav" onclick="app.navDiary(-1)">←</button>
+      <span id="diaryDateDisplay" class="text-sm font-semibold text-violet-500"></span>
+      <button class="date-nav" onclick="app.navDiary(1)">→</button>
+      <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navDiaryTo(todayStr())">今天</button>
+    </div>
+    <div id="diaryHistoryHint" class="mb-2 text-xs text-violet-300"></div>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium diary-tag-success" data-type="success">🎉 成功日记</button>
+      <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium diary-tag-gratitude" data-type="gratitude">🙏 感恩日记</button>
+      <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium diary-tag-zhiji" data-type="zhiji">💡 知己日记</button>
+      <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium diary-tag-notes" data-type="notes">📝 随手记</button>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-4" id="diaryFilterBar">
+      <button class="diary-filter px-3 py-1 rounded-lg text-xs font-medium bg-violet-100 text-violet-500" data-filter="all">全部</button>
+      <button class="diary-filter px-3 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-300 border border-violet-100" data-filter="success">成功</button>
+      <button class="diary-filter px-3 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-300 border border-violet-100" data-filter="gratitude">感恩</button>
+      <button class="diary-filter px-3 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-300 border border-violet-100" data-filter="zhiji">知己</button>
+      <button class="diary-filter px-3 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-300 border border-violet-100" data-filter="notes">笔记</button>
+    </div>
+    <div id="diaryList" class="card p-4"></div>
+  </div>
+
+  <!-- 随笔 -->
+  <div id="panel-notes" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-violet-400 mb-4">随笔</h2>
+    <div class="flex items-center gap-3 mb-4">
+      <button class="date-nav" onclick="app.navNotes(-1)">←</button>
+      <span id="notesDateDisplay" class="text-sm font-semibold text-violet-500"></span>
+      <button class="date-nav" onclick="app.navNotes(1)">→</button>
+      <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navNotesTo(todayStr())">今天</button>
+    </div>
+    <div id="notesHistoryHint" class="mb-2 text-xs text-violet-300"></div>
+    <div class="card p-4 mb-4">
+      <textarea id="notesContent" rows="3" placeholder="随手记录灵感、金句、想法..." class="w-full px-3 py-2 rounded-lg border border-violet-100 text-sm focus:outline-none focus:border-violet-300"></textarea>
+      <div class="flex gap-2 mt-2">
+        <button id="saveNotesBtn" class="px-4 py-2 rounded-lg bg-violet-100 text-violet-500 text-sm font-medium hover:bg-violet-200 transition">保存</button>
+        <button id="clearNotesBtn" class="px-4 py-2 rounded-lg bg-violet-50 text-violet-300 text-sm font-medium border border-violet-100">清空</button>
+      </div>
+    </div>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div id="panel-history" class="panel-section hidden p-5 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-violet-400 mb-4">历史记录</h2>
+    <div class="flex gap-2 mb-4">
+      <button class="hist-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-100 text-violet-500" data-tab="day">日记录</button>
+      <button class="hist-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-50 text-violet-300 border border-violet-100" data-tab="week">周统计</button>
+      <button class="hist-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-50 text-violet-300 border border-violet-100" data-tab="month">月统计</button>
+    </div>
+    <div id="histDayView">
+      <div class="flex items-center gap-3 mb-4">
+        <button class="date-nav" onclick="app.navHist(-1)">←</button>
+        <span id="histDateDisplay" class="text-sm font-semibold text-violet-500"></span>
+        <button class="date-nav" onclick="app.navHist(1)">→</button>
+        <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navHistTo(todayStr())">今天</button>
+      </div>
+      <div id="historyContent" class="space-y-4"></div>
+    </div>
+    <div id="histWeekView" class="hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <button class="date-nav" onclick="app.navHistWeek(-1)">←</button>
+        <span id="histWeekDisplay" class="text-sm font-semibold text-violet-500"></span>
+        <button class="date-nav" onclick="app.navHistWeek(1)">→</button>
+        <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navHistWeekTo(todayStr())">本周</button>
+      </div>
+      <div id="histWeekContent"></div>
+    </div>
+    <div id="histMonthView" class="hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <button class="date-nav" onclick="app.navHistMonth(-1)">←</button>
+        <span id="histMonthDisplay" class="text-sm font-semibold text-violet-500"></span>
+        <button class="date-nav" onclick="app.navHistMonth(1)">→</button>
+        <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navHistMonthTo(todayStr())">本月</button>
+      </div>
+      <div id="histMonthContent"></div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- 底部 Tab（移动端） -->
+<div class="bottom-tabs fixed bottom-0 left-0 right-0 bg-white border-t border-violet-100 flex justify-around py-2 z-50">
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-violet-400 text-xs" data-panel="overview"><span class="text-lg">📊</span><span>总览</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="checkin"><span class="text-lg">✅</span><span>打卡</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="exercise"><span class="text-lg">🏃</span><span>运动</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="study"><span class="text-lg">📖</span><span>学习</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="diary"><span class="text-lg">✍️</span><span>日记</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="notes"><span class="text-lg">📝</span><span>随笔</span></button>
+  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="history"><span class="text-lg">📋</span><span>历史</span></button>
+</div>
+
+<!-- 日记弹窗 -->
+<div id="diaryModal" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
+  <div class="card w-full max-w-md p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 id="diaryModalTitle" class="text-base font-bold text-violet-400">写日记</h3>
+      <button id="closeDiaryModal" class="text-slate-400 hover:text-slate-600 text-xl">×</button>
+    </div>
+    <textarea id="diaryContent" rows="6" placeholder="写下你的想法..." class="w-full px-3 py-2 rounded-lg border border-violet-100 text-sm focus:outline-none focus:border-violet-300 mb-3"></textarea>
+    <div class="flex justify-end gap-2">
+      <button id="cancelDiary" class="px-4 py-2 rounded-lg bg-violet-50 text-violet-300 text-sm font-medium border border-violet-100">取消</button>
+      <button id="saveDiary" class="px-4 py-2 rounded-lg bg-violet-100 text-violet-500 text-sm font-medium hover:bg-violet-200 transition">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== 工具函数 ====================
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateOffset(base,off){const d=new Date(base+'T00:00:00');d.setDate(d.getDate()+off);return dateStr(d);}
+function fmtDate(s){const d=new Date(s+'T00:00:00');const w=['日','一','二','三','四','五','六'];return (d.getMonth()+1)+'月'+d.getDate()+'日 周'+w[d.getDay()];}
+function fmtTime(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+// ==================== 数据结构 ====================
+// 打卡项: checks = [{key,label,emoji}]  存于 localStorage 'checkItems'
+// 打卡记录: checkRecords = { "2024-01-01": {key:true,...} }
+// 运动记录: exRecords = { "2024-01-01": [{type,detail:{},done,tmpId}] }
+// 阅读记录: readRecords = { "2024-01-01": minutes }
+// 多邻国: duoRecords = { "2024-01-01": true }
+// 日记: diaries = [{id,date,type,content,time}]
+// 随笔: notes = [{id,date,content,time,tag}]
+
+const DIARY_TYPES={success:{label:'成功日记',emoji:'🎉',cls:'diary-tag-success'},gratitude:{label:'感恩日记',emoji:'🙏',cls:'diary-tag-gratitude'},zhiji:{label:'知己日记',emoji:'💡',cls:'diary-tag-zhiji'},notes:{label:'随手记',emoji:'📝',cls:'diary-tag-notes'}};
+
+const DEFAULT_EX_TYPES=[
+  {key:'climb',label:'爬坡',emoji:'🧗',fields:[{key:'duration',label:'时长',unit:'min',type:'number',min:0,max:300,step:5,default:30},{key:'incline',label:'坡度',unit:'%',type:'number',min:0,max:20,step:1,default:10}]},
+  {key:'swim',label:'游泳',emoji:'🏊',fields:[{key:'distance',label:'距离',unit:'m',type:'number',min:0,max:5000,step:50,default:1000},{key:'duration',label:'时长',unit:'min',type:'number',min:0,max:300,step:5,default:40}]},
+  {key:'back',label:'练背',emoji:'💪',fields:[{key:'duration',label:'时长',unit:'min',type:'number',min:0,max:300,step:5,default:45},{key:'sets',label:'组数',unit:'组',type:'number',min:0,max:30,step:1,default:5}]}
+];
+function getExTypes(){return load('exTypes',DEFAULT_EX_TYPES);}
+function setExTypes(v){save('exTypes',v);}
+function findExType(key){return getExTypes().find(x=>x.key===key)||{label:'未知',emoji:'❓',fields:[]};}
+
+const DEFAULT_CHECKS=[
+  {key:'trash',label:'倒垃圾',emoji:'🗑'},
+  {key:'breakfast',label:'做早餐',emoji:'🍳'},
+  {key:'fishoil',label:'鱼油',emoji:'🐟'},
+  {key:'vitamind',label:'维生素D',emoji:'☀️'},
+  {key:'earlysleep',label:'早睡',emoji:'🌙'},
+  {key:'kuaishou',label:'快手打卡',emoji:'📱'},
+  {key:'hongguo',label:'红果打卡',emoji:'🍅'}
+];
+
+// ==================== 状态 ====================
+let vdCheck=todayStr(),vdEx=todayStr(),vdStudy=todayStr(),vdDiary=todayStr(),vdNotes=todayStr(),vdHist=todayStr();
+let diaryFilter='all';
+let diaryModalType='success';
+let editingCheckItem=null;
+
+// ==================== 打卡 ====================
+function getCheckItems(){return load('checkItems',DEFAULT_CHECKS);}
+function setCheckItems(v){save('checkItems',v);}
+function getChecks(date){const r=load('checkRecords',{});return r[date]||{};}
+function setChecks(date,v){const r=load('checkRecords',{});r[date]=v;save('checkRecords',r);}
+function toggleCheck(date,key){const c=getChecks(date);c[key]=!c[key];setChecks(date,c);}
+function deleteCheck(date,key){const c=getChecks(date);delete c[key];setChecks(date,c);}
+
+function renderCheck(){
+  const items=getCheckItems();
+  const checks=getChecks(vdCheck);
+  const doneCount=items.filter(i=>checks[i.key]).length;
+  $('#checkinDateDisplay').textContent=fmtDate(vdCheck);
+  $('#checkProgress').textContent=doneCount+'/'+items.length+' 已完成';
+  const hint=vdCheck===todayStr()?'':(checks&&Object.keys(checks).length?'已打卡 '+Object.keys(checks).length+' 项':'未打卡');
+  $('#checkinHistoryHint').textContent=hint;
+
+  let grid='<div class="flex flex-wrap justify-center gap-4">';
+  items.forEach(item=>{
+    const done=checks[item.key];
+    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${vdCheck}','${item.key}');renderAll();">
+      <div class="check-emoji">${item.emoji}</div>
+      <div class="check-done text-2xl">✓</div>
+      <div class="text-[10px] mt-1 ${done?'text-violet-400':'text-slate-400'}">${item.label}</div>
+    </div>`;
+  });
+  grid+='</div>';
+  $('#checkGrid').innerHTML=grid;
+
+  // 管理打卡项
+  let mgmt='<div class="mt-6 pt-4 border-t border-violet-100">';
+  mgmt+='<div class="flex items-center justify-between mb-3"><span class="text-sm font-medium text-violet-400">管理打卡项</span></div>';
+  mgmt+='<div class="card">';
+  items.forEach(item=>{
+    mgmt+=`<div class="item-row"><div class="flex items-center gap-2"><span class="text-lg">${item.emoji}</span><span class="text-sm text-slate-600">${item.label}</span></div><div class="delete-btn" onclick="deleteCheckItem('${item.key}')"><span>🗑</span></div></div>`;
+  });
+  mgmt+='</div>';
+  mgmt+='<div class="flex gap-2 mt-3"><input id="newCheckEmoji" type="text" placeholder="🎯" maxlength="2" class="w-12 px-2 py-2 text-center rounded-lg border border-violet-100 text-sm"><input id="newCheckLabel" type="text" placeholder="打卡项名称" class="flex-1 px-3 py-2 rounded-lg border border-violet-100 text-sm"><button class="px-4 py-2 rounded-lg bg-violet-100 text-violet-500 text-sm font-medium hover:bg-violet-200 transition" onclick="addCheckItem()">添加</button></div>';
+  mgmt+='</div>';
+  $('#checkinRecords').innerHTML=mgmt;
+}
+
+function addCheckItem(){
+  const emoji=$('#newCheckEmoji').value.trim()||'🎯';
+  const label=$('#newCheckLabel').value.trim();
+  if(!label)return;
+  const items=getCheckItems();
+  const key='c'+Date.now();
+  items.push({key,label,emoji});
+  setCheckItems(items);
+  $('#newCheckEmoji').value='';
+  $('#newCheckLabel').value='';
+  renderAll();
+}
+
+function deleteCheckItem(key){
+  if(!confirm('确认删除这个打卡项？'))return;
+  const items=getCheckItems().filter(i=>i.key!==key);
+  setCheckItems(items);
+  renderAll();
+}
+
+// ==================== 运动 ====================
+function addExType(){
+  const emoji=$('#newExEmoji').value.trim()||'🎯';
+  const label=$('#newExLabel').value.trim();
+  if(!label)return;
+  const types=getExTypes();
+  const key='ex'+Date.now();
+  types.push({key,label,emoji,fields:[{key:'duration',label:'时长',unit:'min',type:'number',min:0,max:300,step:5,default:30}]});
+  setExTypes(types);
+  $('#newExEmoji').value='';
+  $('#newExLabel').value='';
+  renderExercise();
+}
+function deleteExType(key){
+  if(!confirm('确认删除这个运动项？历史记录不受影响。'))return;
+  const types=getExTypes().filter(i=>i.key!==key);
+  setExTypes(types);
+  renderExercise();
+}
+function getEx(date){const r=load('exRecords',{});return r[date]||[];}
+function setEx(date,v){const r=load('exRecords',{});r[date]=v;save('exRecords',r);}
+function addEx(type){const ex=getEx(vdEx);const t=getExTypes().find(x=>x.key===type);const detail={};t.fields.forEach(f=>detail[f.key]=f.default);ex.push({type,detail,done:false});setEx(vdEx,ex);renderExercise();}
+
+function renderExercise(){
+  const ex=getEx(vdEx);
+  $('#exDateDisplay').textContent=fmtDate(vdEx);
+  const hint=vdEx===todayStr()?'':(ex.length?ex.length+' 项运动记录':'无运动记录');
+  $('#exHistoryHint').textContent=hint;
+
+  // 运动类型选择
+  let tags='<div class="flex flex-wrap gap-2">';
+  getExTypes().forEach(t=>{
+    tags+=`<span class="ex-chip ex-chip-off" onclick="addEx('${t.key}')">${t.emoji} ${t.label}</span>`;
+  });
+  tags+='</div>';
+  $('#exTagList').innerHTML=tags;
+
+  // 未完成的运动详情
+  let details='';
+  ex.forEach((e,idx)=>{
+    if(e.done)return;
+    const t=findExType(e.type);
+    let fields=`<div class="card p-3"><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-green-500">${t.emoji} ${t.label}</span><button class="text-xs text-red-400 hover:text-red-600" onclick="app.cancelEx('${vdEx}',${idx})">取消</button></div>`;
+    if(t.fields.length===0){
+      fields+='<p class="text-xs text-green-300">休息日，好好放松～</p>';
+    }else{
+      t.fields.forEach(f=>{
+        const val=e.detail[f.key]??f.default;
+        fields+=`<div class="mb-2"><div class="flex justify-between text-xs text-green-400 mb-1"><span>${f.label}</span><span id="exv_${idx}_${f.key}">${val}${f.unit}</span></div>`;
+        if(f.type==='range'){
+          fields+=`<input type="range" id="exf_${idx}_${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${val}" class="w-full" oninput="$('#exv_${idx}_${f.key}').textContent=this.value+'${f.unit}'">`;
+        }else{
+          fields+=`<input type="number" id="exf_${idx}_${f.key}" value="${val}" min="${f.min}" max="${f.max}" step="${f.step}" class="w-full px-2 py-1 rounded border border-green-100 text-sm">`;
+        }
+        fields+='</div>';
+      });
+    }
+    fields+=`<button class="w-full py-2 rounded-lg bg-green-100 text-green-500 text-sm font-medium hover:bg-green-200 transition" onclick="app.completeEx('${vdEx}',${idx})">完成 ✓</button></div>`;
+    details+=fields;
+  });
+  $('#exDetailArea').innerHTML=details;
+
+  // 已完成的记录
+  let recs='';
+  ex.filter(e=>e.done).forEach((e,idx)=>{
+    const t=findExType(e.type);
+    let txt=t.emoji+' '+t.label;
+    if(t.fields.length>0){
+      txt+='：'+t.fields.map(f=>e.detail[f.key]+f.unit).join(' / ');
+    }
+    recs+=`<div class="ex-record-card ${e.type==='rest'?'ex-rest':''}"><span class="ex-record-text">${txt}</span><div class="delete-btn-small" onclick="app.deleteEx('${vdEx}',${getActualIdx(vdEx,e)})">🗑</div></div>`;
+  });
+  $('#exRecordsArea').innerHTML=recs;
+
+  // 本周统计
+  let weekMin=0,weekCount=0;
+  for(let i=0;i<7;i++){
+    const d=dateOffset(todayStr(),-i);
+    const es=getEx(d);
+    es.forEach(e=>{
+      if(e.done&&e.type!=='rest'){
+        weekCount++;
+        const t=findExType(e.type);
+        const durField=t.fields.find(f=>f.key==='duration');
+        if(durField)weekMin+=e.detail.duration||0;
+      }
+    });
+  }
+  $('#weekExerciseStat').textContent='本周运动 '+weekCount+' 次'+(weekMin?'，共 '+weekMin+' 分钟':'');
+
+  // 管理运动项模块
+  const exTypes=getExTypes();
+  let mgmt='<div class="flex items-center justify-between mb-3"><span class="text-sm font-medium text-green-500">管理运动项</span></div>';
+  mgmt+='<div class="card">';
+  if(exTypes.length===0)mgmt+='<p class="text-xs text-green-300 py-3 text-center">暂无运动项</p>';
+  exTypes.forEach(item=>{
+    mgmt+=`<div class="item-row"><div class="flex items-center gap-2"><span class="text-lg">${item.emoji}</span><span class="text-sm text-slate-600">${item.label}</span></div><div class="delete-btn" onclick="deleteExType('${item.key}')"><span>🗑</span></div></div>`;
+  });
+  mgmt+='</div>';
+  mgmt+='<div class="flex gap-2 mt-3"><input id="newExEmoji" type="text" placeholder="🎯" maxlength="2" class="w-12 px-2 py-2 text-center rounded-lg border border-green-100 text-sm"><input id="newExLabel" type="text" placeholder="运动项名称（如：跑步）" class="flex-1 px-3 py-2 rounded-lg border border-green-100 text-sm"><button class="px-4 py-2 rounded-lg bg-green-100 text-green-500 text-sm font-medium hover:bg-green-200 transition" onclick="addExType()">添加</button></div>';
+  mgmt+='<p class="text-xs text-green-300 mt-2">新增运动项默认包含"时长"字段</p>';
+  $('#exMgmtArea').innerHTML=mgmt;
+}
+
+function getActualIdx(date,e){
+  const ex=getEx(date);
+  return ex.findIndex(x=>x===e);
+}
+
+// ==================== 学习 ====================
+function getReads(){return load('readRecords',{});}
+function setReads(v){save('readRecords',v);}
+function getRead(date){return (load('readRecords',{})[date])||0;}
+function saveReadRecord(){
+  const min=parseInt($('#readMinutesInput').value);
+  if(!min||min<=0)return;
+  const reads=getReads();
+  reads[vdStudy]=(reads[vdStudy]||0)+min;
+  setReads(reads);
+  $('#readMinutesInput').value='';
+  renderAll();
+}
+function deleteRead(date){const r=getReads();delete r[date];setReads(r);}
+function deleteReadMin(date,min){const r=getReads();r[date]=(r[date]||0)-min;if(r[date]<=0)delete r[date];setReads(r);}
+
+function getDuo(){return load('duoRecords',{});}
+function setDuo(v){save('duoRecords',v);}
+function getDuoDay(date){return !!load('duoRecords',{})[date];}
+function toggleDuo(){const d=getDuo();d[vdStudy]=!d[vdStudy];setDuo(d);renderAll();}
+function deleteDuo(date){const d=getDuo();delete d[date];setDuo(d);}
+
+function updateReadGoal(v){save('readGoal',parseInt(v));$('#readGoalDisplay').textContent=v;renderAll();}
+
+function renderStudy(){
+  $('#studyDateDisplay').textContent=fmtDate(vdStudy);
+  const reads=getReads();
+  const todayRead=reads[vdStudy]||0;
+  const goal=load('readGoal',30);
+  const hint=vdStudy===todayStr()?'':(todayRead>0?'阅读 '+todayRead+' 分钟':'无阅读记录');
+  $('#studyHistoryHint').textContent=hint;
+
+  $('#readGoalSlider').value=goal;
+  $('#readGoalDisplay').textContent=goal;
+
+  // 阅读记录
+  let recs='';
+  if(todayRead>0){
+    recs+=`<div class="read-record"><span class="text-sm text-amber-600">📖 ${todayRead} 分钟</span><div class="delete-btn-small" onclick="app.deleteReadRecord('${vdStudy}',${todayRead})">🗑</div></div>`;
+  }
+  $('#readRecordsList').innerHTML=recs||'<p class="text-xs text-amber-200">尚无记录</p>';
+
+  // 多邻国
+  const duoDone=getDuoDay(vdStudy);
+  $('#duoBtn').textContent=duoDone?'已完成 ✓':'标记完成';
+  $('#duoBtn').className=duoDone?'w-full py-3 rounded-xl text-sm font-medium bg-green-100 text-green-500 transition':'w-full py-3 rounded-xl text-sm font-medium bg-pink-50 text-pink-400 hover:bg-pink-100 transition';
+  if(duoDone){
+    $('#duoRecord').innerHTML=`<div class="read-record" style="background:#fce7f3;border-color:#f9a8d4;"><span class="text-sm text-pink-600">🦉 多邻国已完成</span><div class="delete-btn-small" onclick="app.deleteDuoRecord('${vdStudy}')">🗑</div></div>`;
+  }else{
+    $('#duoRecord').innerHTML='';
+  }
+
+  // 本周统计
+  let weekRead=0,weekDuo=0;
+  for(let i=0;i<7;i++){
+    const d=dateOffset(todayStr(),-i);
+    weekRead+=reads[d]||0;
+    if(getDuoDay(d))weekDuo++;
+  }
+  $('#weekStudyStat').textContent='本周阅读 '+weekRead+' 分钟，多邻国 '+weekDuo+' 天';
+}
+
+// ==================== 日记 ====================
+function getDiaries(){return load('diaries',[]);}
+function setDiaries(v){save('diaries',v);}
+function saveDiary(){
+  const content=$('#diaryContent').value.trim();
+  if(!content)return;
+  const diaries=getDiaries();
+  diaries.unshift({id:Date.now(),date:vdDiary,type:diaryModalType,content,time:fmtTime()});
+  setDiaries(diaries);
+  closeDiaryModal();
+  renderAll();
+}
+function deleteDiary(id){const d=getDiaries().filter(x=>x.id!==id);setDiaries(d);}
+function openDiaryModal(type){diaryModalType=type;$('#diaryModalTitle').textContent=DIARY_TYPES[type].emoji+' '+DIARY_TYPES[type].label;$('#diaryContent').value='1. ';$('#diaryModal').classList.remove('hidden');$('#diaryModal').classList.add('flex');$('#diaryContent').focus();}
+function closeDiaryModal(){$('#diaryModal').classList.add('hidden');$('#diaryModal').classList.remove('flex');}
+
+function renderDiaryList(){
+  $('#diaryDateDisplay').textContent=fmtDate(vdDiary);
+  const diaries=getDiaries().filter(d=>d.date===vdDiary);
+  const filtered=diaryFilter==='all'?diaries:diaries.filter(d=>d.type===diaryFilter);
+  const hint=vdDiary===todayStr()?'':(diaries.length?'当日 '+diaries.length+' 条':'当日无日记');
+  $('#diaryHistoryHint').textContent=hint;
+
+  if(filtered.length===0){
+    $('#diaryList').innerHTML='<p class="text-center text-sm text-violet-300 py-8">还没有日记，点击上方按钮开始记录吧～</p>';
+    return;
+  }
+  let html='';
+  filtered.forEach(d=>{
+    const t=DIARY_TYPES[d.type];
+    html+=`<div class="diary-line"><div class="diary-num">${diaries.indexOf(d)+1}</div><div class="diary-tag"><span class="${t.cls}">${t.emoji}</span></div><div class="diary-text">${escapeHtml(d.content)}</div><div class="diary-time">${d.time}</div><div class="delete-btn" onclick="app.deleteDiaryItem(${d.id})"><span>🗑</span></div></div>`;
+  });
+  $('#diaryList').innerHTML=html;
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ==================== 随笔 ====================
+function getNotes(){return load('notes',[]);}
+function setNotes(v){save('notes',v);}
+function saveNotes(){
+  const content=$('#notesContent').value.trim();
+  if(!content)return;
+  const notes=getNotes();
+  notes.unshift({id:Date.now(),date:vdNotes,content,time:fmtTime()});
+  setNotes(notes);
+  $('#notesContent').value='';
+  renderAll();
+}
+function deleteNotes(id){const n=getNotes().filter(x=>x.id!==id);setNotes(n);}
+
+function renderNotes(){
+  $('#notesDateDisplay').textContent=fmtDate(vdNotes);
+  const notes=getNotes().filter(n=>n.date===vdNotes);
+  const hint=vdNotes===todayStr()?'':(notes.length?'当日 '+notes.length+' 条':'当日无随笔');
+  $('#notesHistoryHint').textContent=hint;
+
+  if(notes.length===0){
+    $('#notesList').innerHTML='<p class="text-center text-sm text-violet-300 py-8">还没有随笔，开始记录灵感吧～</p>';
+    return;
+  }
+  let html='';
+  notes.forEach(n=>{
+    html+=`<div class="notes-item"><div class="notes-text">${escapeHtml(n.content)}</div><div class="notes-meta"><span>⏰ ${n.time}</span></div><div class="delete-btn" onclick="app.deleteNotesItem(${n.id})"><span>🗑</span></div></div>`;
+  });
+  $('#notesList').innerHTML=html;
+}
+
+// ==================== 历史记录 ====================
+function renderHistory(){
+  $('#histDateDisplay').textContent=fmtDate(vdHist);
+  const checks=getChecks(vdHist);
+  const ex=getEx(vdHist);
+  const read=getRead(vdHist);
+  const duo=getDuoDay(vdHist);
+  const diaries=getDiaries().filter(d=>d.date===vdHist);
+  const notes=getNotes().filter(n=>n.date===vdHist);
+
+  let html='';
+
+  // 打卡
+  html+='<div class="card p-4"><h3 class="text-sm font-semibold text-violet-400 mb-3">✅ 打卡</h3>';
+  const items=getCheckItems();
+  if(Object.keys(checks).length===0){
+    html+='<p class="text-xs text-violet-300">无记录</p>';
+  }else{
+    items.forEach(item=>{
+      if(checks[item.key]!==undefined){
+        html+=`<div class="flex items-center gap-2 text-sm py-1"><span>${checks[item.key]?'✓':'○'}</span><span>${item.emoji} ${item.label}</span></div>`;
+      }
+    });
+  }
+  html+='</div>';
+
+  // 运动
+  html+='<div class="card p-4"><h3 class="text-sm font-semibold text-green-500 mb-3">🏃 运动</h3>';
+  if(ex.length===0){
+    html+='<p class="text-xs text-green-300">无记录</p>';
+  }else{
+    ex.forEach(e=>{
+      if(!e.done)return;
+      const t=findExType(e.type);
+      let txt=t.emoji+' '+t.label;
+      if(t.fields.length>0)txt+='：'+t.fields.map(f=>e.detail[f.key]+f.unit).join(' / ');
+      html+=`<div class="text-sm text-green-600 py-1">${txt}</div>`;
+    });
+  }
+  html+='</div>';
+
+  // 学习
+  html+='<div class="card p-4"><h3 class="text-sm font-semibold text-amber-400 mb-3">📖 学习</h3>';
+  if(read>0)html+=`<div class="text-sm text-amber-600 py-1">📖 阅读 ${read} 分钟</div>`;
+  if(duo)html+=`<div class="text-sm text-pink-600 py-1">🦉 多邻国已完成</div>`;
+  if(read===0&&!duo)html+='<p class="text-xs text-amber-200">无记录</p>';
+  html+='</div>';
+
+  // 日记
+  html+='<div class="card p-4"><h3 class="text-sm font-semibold text-violet-400 mb-3">✍️ 日记</h3>';
+  if(diaries.length===0){
+    html+='<p class="text-xs text-violet-300">无记录</p>';
+  }else{
+    diaries.forEach(d=>{
+      const t=DIARY_TYPES[d.type];
+      html+=`<div class="mb-2 pb-2 border-b border-violet-50 last:border-0"><span class="${t.cls}" style="font-size:10px;padding:2px 6px;border-radius:4px;">${t.emoji} ${t.label}</span><p class="text-sm text-slate-600 mt-1 whitespace-pre-wrap">${escapeHtml(d.content)}</p><p class="text-xs text-violet-300 mt-1">${d.time}</p></div>`;
+    });
+  }
+  html+='</div>';
+
+  // 随笔
+  html+='<div class="card p-4"><h3 class="text-sm font-semibold text-violet-400 mb-3">📝 随笔</h3>';
+  if(notes.length===0){
+    html+='<p class="text-xs text-violet-300">无记录</p>';
+  }else{
+    notes.forEach(n=>{
+      html+=`<div class="mb-2 pb-2 border-b border-violet-50 last:border-0"><p class="text-sm text-slate-600 whitespace-pre-wrap">${escapeHtml(n.content)}</p><p class="text-xs text-violet-300 mt-1">${n.time}</p></div>`;
+    });
+  }
+  html+='</div>';
+
+  $('#historyContent').innerHTML=html;
+}
+
+// ==================== 周/月统计 ====================
+let histTab='day';
+let vdHistWeek=todayStr(),vdHistMonth=todayStr();
+function switchHistTab(tab){
+  histTab=tab;
+  $$('.hist-tab').forEach(b=>{
+    b.classList.remove('bg-violet-100','text-violet-500');
+    b.classList.add('bg-violet-50','text-violet-300','border','border-violet-100');
+  });
+  const active=$$('.hist-tab')[['day','week','month'].indexOf(tab)];
+  if(active){active.classList.add('bg-violet-100','text-violet-500');active.classList.remove('bg-violet-50','text-violet-300','border','border-violet-100');}
+  $('#histDayView').classList.toggle('hidden',tab!=='day');
+  $('#histWeekView').classList.toggle('hidden',tab!=='week');
+  $('#histMonthView').classList.toggle('hidden',tab!=='month');
+  if(tab==='week')renderWeekStat();
+  if(tab==='month')renderMonthStat();
+}
+
+function getWeekRange(base){
+  const d=new Date(base+'T00:00:00');
+  const day=d.getDay()||7;
+  const monday=new Date(d);monday.setDate(d.getDate()-day+1);
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
+  return [dateStr(monday),dateStr(sunday)];
+}
+
+function renderWeekStat(){
+  const [mon,sun]=getWeekRange(vdHistWeek);
+  const days=[];
+  for(let i=0;i<7;i++)days.push(dateOffset(mon,i));
+  const m=new Date(mon+'T00:00:00'),s=new Date(sun+'T00:00:00');
+  const w=['日','一','二','三','四','五','六'];
+  const rangeTxt=(m.getMonth()+1)+'/'+m.getDate()+'(周'+w[m.getDay()]+') ~ '+(s.getMonth()+1)+'/'+s.getDate()+'(周'+w[s.getDay()]+')';
+  $('#histWeekDisplay').textContent=rangeTxt;
+
+  const checkItems=getCheckItems();
+  const exTypes=getExTypes();
+  const checkRecords=load('checkRecords',{});
+  const exRecords=load('exRecords',{});
+  const readRecords=load('readRecords',{});
+  const duoRecords=load('duoRecords',{});
+
+  // 汇总各活动次数
+  const checkCount={};checkItems.forEach(i=>checkCount[i.key]=0);
+  const exCount={};exTypes.forEach(i=>exCount[i.key]=0);
+  let totalRead=0,totalDuo=0;
+
+  days.forEach(d=>{
+    const cr=checkRecords[d]||{};
+    checkItems.forEach(i=>{if(cr[i.key])checkCount[i.key]++;});
+    const er=(exRecords[d]||[]).filter(e=>e.done);
+    er.forEach(e=>{if(exCount[e.type]!==undefined)exCount[e.type]++;});
+    totalRead+=readRecords[d]||0;
+    if(duoRecords[d])totalDuo++;
+  });
+
+  let html=`<div class="card p-4 mb-4"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-violet-400">📊 本周统计</h3><span class="text-xs text-violet-300">${rangeTxt}</span></div>`;
+
+  // 打卡
+  html+='<div class="mb-3"><p class="text-xs font-medium text-violet-400 mb-2">每日打卡</p>';
+  if(checkItems.length===0)html+='<p class="text-xs text-violet-300">无打卡项</p>';
+  checkItems.forEach(i=>{
+    const c=checkCount[i.key]||0;
+    const bar=c>0?Math.round(c/7*100):0;
+    html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=7?'text-green-500':c>0?'text-violet-400':'text-slate-300'}">${c}/7 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=7?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;
+  });
+  html+='</div>';
+
+  // 运动
+  html+='<div class="mb-3"><p class="text-xs font-medium text-green-500 mb-2">运动</p>';
+  if(exTypes.length===0)html+='<p class="text-xs text-green-300">无运动项</p>';
+  exTypes.forEach(i=>{
+    const c=exCount[i.key]||0;
+    const bar=c>0?Math.round(c/7*100):0;
+    html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-300'}">${c} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full bg-green-400" style="width:${bar}%"></div></div></div>`;
+  });
+  html+='</div>';
+
+  // 学习
+  html+='<div><p class="text-xs font-medium text-amber-400 mb-2">学习</p>';
+  html+=`<div class="flex justify-between items-center text-xs py-1"><span>📖 阅读</span><span class="font-medium text-amber-500">${totalRead} 分钟</span></div>`;
+  html+=`<div class="flex justify-between items-center text-xs py-1"><span>🦉 多邻国</span><span class="font-medium text-pink-500">${totalDuo}/7 天</span></div>`;
+  html+='</div></div>';
+
+  $('#histWeekContent').innerHTML=html;
+}
+
+function renderMonthStat(){
+  const d=new Date(vdHistMonth+'T00:00:00');
+  const y=d.getFullYear(),m=d.getMonth();
+  const monthTxt=y+'年'+(m+1)+'月';
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  $('#histMonthDisplay').textContent=monthTxt;
+
+  const checkItems=getCheckItems();
+  const exTypes=getExTypes();
+  const checkRecords=load('checkRecords',{});
+  const exRecords=load('exRecords',{});
+  const readRecords=load('readRecords',{});
+  const duoRecords=load('duoRecords',{});
+
+  const checkCount={};checkItems.forEach(i=>checkCount[i.key]=0);
+  const exCount={};exTypes.forEach(i=>exCount[i.key]=0);
+  let totalRead=0,totalDuo=0;
+
+  for(let day=1;day<=daysInMonth;day++){
+    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    const cr=checkRecords[ds]||{};
+    checkItems.forEach(i=>{if(cr[i.key])checkCount[i.key]++;});
+    const er=(exRecords[ds]||[]).filter(e=>e.done);
+    er.forEach(e=>{if(exCount[e.type]!==undefined)exCount[e.type]++;});
+    totalRead+=readRecords[ds]||0;
+    if(duoRecords[ds])totalDuo++;
+  }
+
+  let html=`<div class="card p-4 mb-4"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-violet-400">📅 本月统计</h3><span class="text-xs text-violet-300">${monthTxt}（共${daysInMonth}天）</span></div>`;
+
+  // 打卡
+  html+='<div class="mb-3"><p class="text-xs font-medium text-violet-400 mb-2">每日打卡</p>';
+  if(checkItems.length===0)html+='<p class="text-xs text-violet-300">无打卡项</p>';
+  checkItems.forEach(i=>{
+    const c=checkCount[i.key]||0;
+    const bar=c>0?Math.round(c/daysInMonth*100):0;
+    html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=daysInMonth?'text-green-500':c>0?'text-violet-400':'text-slate-300'}">${c}/${daysInMonth} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=daysInMonth?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;
+  });
+  html+='</div>';
+
+  // 运动
+  html+='<div class="mb-3"><p class="text-xs font-medium text-green-500 mb-2">运动</p>';
+  if(exTypes.length===0)html+='<p class="text-xs text-green-300">无运动项</p>';
+  exTypes.forEach(i=>{
+    const c=exCount[i.key]||0;
+    html+=`<div class="flex justify-between items-center text-xs py-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-300'}">${c} 次</span></div>`;
+  });
+  html+='</div>';
+
+  // 学习
+  html+='<div><p class="text-xs font-medium text-amber-400 mb-2">学习</p>';
+  html+=`<div class="flex justify-between items-center text-xs py-1"><span>📖 阅读</span><span class="font-medium text-amber-500">${totalRead} 分钟</span></div>`;
+  html+=`<div class="flex justify-between items-center text-xs py-1"><span>🦉 多邻国</span><span class="font-medium text-pink-500">${totalDuo} 天</span></div>`;
+  html+='</div></div>';
+
+  $('#histMonthContent').innerHTML=html;
+}
+
+// ==================== 总览 & 头部 ====================
+function calcStreak(){
+  let streak=0;
+  let d=todayStr();
+  while(true){
+    const checks=getChecks(d);
+    const ex=getEx(d).filter(e=>e.done).length;
+    const read=getRead(d);
+    const duo=getDuoDay(d);
+    const hasActivity=Object.values(checks).some(v=>v)||ex>0||read>0||duo;
+    if(!hasActivity)break;
+    streak++;
+    d=dateOffset(d,-1);
+    if(streak>365)break;
+  }
+  return streak;
+}
+
+function calcCompletion(){
+  const today=todayStr();
+  const items=getCheckItems();
+  const checks=getChecks(today);
+  const checkDone=items.filter(i=>checks[i.key]).length;
+  const exDone=getEx(today).filter(e=>e.done).length;
+  const read=getRead(today);
+  const readGoal=load('readGoal',30);
+  const duo=getDuoDay(today);
+
+  let total=items.length+1+1+1; // 打卡+运动+阅读+多邻国
+  let done=checkDone+(exDone>0?1:0)+(read>=readGoal?1:0)+(duo?1:0);
+  return Math.round(done/total*100);
+}
+
+function renderHeader(){
+  const d=new Date();
+  const w=['日','一','二','三','四','五','六'];
+  const ds=(d.getMonth()+1)+'月'+d.getDate()+'日 周'+w[d.getDay()];
+  $('#todayDateSidebar').textContent=ds;
+  $('#todayDateMain').textContent=ds;
+
+  const pct=calcCompletion();
+  const streak=calcStreak();
+  $('#completionPct').textContent=pct+'%';
+  $('#completionBar').style.width=pct+'%';
+  $('#streakDays').textContent=streak;
+  $('#completionPctMain').textContent=pct+'%';
+  $('#completionBarMain').style.width=pct+'%';
+
+  // mini summary
+  const items=getCheckItems();
+  const checks=getChecks(todayStr());
+  const checkDone=items.filter(i=>checks[i.key]).length;
+  const exDone=getEx(todayStr()).filter(e=>e.done).length;
+  let ms=[];
+  ms.push(`<span class="px-2 py-1 rounded-full ${checkDone===items.length?'bg-green-50 text-green-500':'bg-violet-50 text-violet-400'}">✅ ${checkDone}/${items.length}</span>`);
+  ms.push(`<span class="px-2 py-1 rounded-full ${exDone>0?'bg-green-50 text-green-500':'bg-green-50 text-green-300'}">🏃 ${exDone>0?exDone+'项':'未做'}</span>`);
+  const readGoal=load('readGoal',30);
+  const todayRead=getRead(todayStr());
+  ms.push(`<span class="px-2 py-1 rounded-full ${todayRead>=readGoal?'bg-amber-50 text-amber-500':todayRead>0?'bg-amber-50 text-amber-400':'bg-amber-50 text-amber-200'}">📖 ${todayRead}/${readGoal}min</span>`);
+  ms.push(`<span class="px-2 py-1 rounded-full ${getDuoDay(todayStr())?'bg-pink-50 text-pink-500':'bg-pink-50 text-pink-200'}">🦉 ${getDuoDay(todayStr())?'✓':'○'}</span>`);
+  $('#miniSummary').innerHTML=ms.join('');
+}
+
+function renderQuickCheck(){
+  const items=getCheckItems();
+  const checks=getChecks(todayStr());
+  let grid='';
+  items.forEach(item=>{
+    const done=checks[item.key];
+    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${todayStr()}','${item.key}');renderAll();">
+      <div class="check-emoji">${item.emoji}</div>
+      <div class="check-done text-2xl">✓</div>
+      <div class="text-[10px] mt-1 ${done?'text-violet-400':'text-slate-400'}">${item.label}</div>
+    </div>`;
+  });
+  $('#quickCheckGrid').innerHTML=grid;
+}
+
+function renderOverviewStatus(){
+  const today=todayStr();
+  const items=getCheckItems();
+  const checks=getChecks(today);
+  const ex=getEx(today).filter(e=>e.done);
+  const reads=getReads();
+  const duo=getDuoDay(today);
+  let sl=[];
+  // 打卡
+  const checkDone=items.filter(i=>checks[i.key]).length;
+  if(checkDone===items.length&&items.length>0)sl.push('<div class="flex items-center gap-1.5 text-green-500"><span>✓</span> 打卡全部完成</div>');
+  else if(checkDone>0)sl.push('<div class="flex items-center gap-1.5 text-violet-400"><span>◐</span> 打卡 '+checkDone+'/'+items.length+'</div>');
+  else sl.push('<div class="flex items-center gap-1.5 text-violet-300"><span>○</span> 打卡未开始</div>');
+  // 运动
+  if(ex.length>0){
+    const exTxt=ex.map(e=>{const t=findExType(e.type);return t.emoji+t.label;}).join(' ');
+    sl.push('<div class="flex items-center gap-1.5 text-green-500"><span>✓</span> 运动：'+exTxt+'</div>');
+  }else sl.push('<div class="flex items-center gap-1.5 text-green-300"><span>○</span> 运动未开始</div>');
+  // 阅读
+  const mR=reads[today]||0,gl=load('readGoal',30);
+  if(mR>=gl)sl.push('<div class="flex items-center gap-1.5 text-amber-500"><span>✓</span> 阅读达成</div>');
+  else if(mR>0)sl.push('<div class="flex items-center gap-1.5 text-amber-400"><span>◐</span> 阅读'+mR+'/'+gl+'min</div>');
+  else sl.push('<div class="flex items-center gap-1.5 text-amber-200"><span>○</span> 阅读未开始</div>');
+  // 多邻国
+  if(duo)sl.push('<div class="flex items-center gap-1.5 text-pink-400"><span>✓</span> 多邻国完成</div>');
+  else sl.push('<div class="flex items-center gap-1.5 text-pink-200"><span>○</span> 多邻国未完成</div>');
+  $('#overviewStatus').innerHTML=sl.join('');
+}
+
+// ==================== 面板切换 ====================
+function switchPanel(name){
+  $$('.panel-section').forEach(p=>p.classList.add('hidden'));
+  $('#panel-'+name).classList.remove('hidden');
+  $$('.sidebar-item').forEach(b=>{b.classList.remove('active');b.classList.add('text-slate-500');if(b.dataset.panel===name){b.classList.add('active');b.classList.remove('text-slate-500');}});
+  $$('.bottom-tab').forEach(b=>{b.classList.remove('text-violet-400');b.classList.add('text-slate-400');if(b.dataset.panel===name){b.classList.add('text-violet-400');b.classList.remove('text-slate-400');}});
+  $('#mainContent').scrollTop=0;
+}
+
+function renderAll(){renderHeader();renderQuickCheck();renderOverviewStatus();renderCheck();renderExercise();renderStudy();renderDiaryList();renderNotes();renderHistory();if(histTab==='week')renderWeekStat();if(histTab==='month')renderMonthStat();}
+
+// ==================== 事件绑定 ====================
+function bindAll(){
+  $$('.sidebar-item').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
+  $$('.bottom-tab').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
+  $$('.diary-btn').forEach(b=>b.onclick=()=>openDiaryModal(b.dataset.type));
+  $$('.diary-filter').forEach(b=>b.onclick=()=>{diaryFilter=b.dataset.filter;$$('.diary-filter').forEach(x=>{x.classList.remove('bg-violet-100','text-violet-500');x.classList.add('bg-violet-50','text-violet-300','border','border-violet-100');});b.classList.add('bg-violet-100','text-violet-500');b.classList.remove('bg-violet-50','text-violet-300','border','border-violet-100');renderDiaryList();});
+  $('#closeDiaryModal').onclick=closeDiaryModal;$('#cancelDiary').onclick=closeDiaryModal;$('#saveDiary').onclick=saveDiary;
+  $('#diaryModal').addEventListener('click',e=>{if(e.target.id==='diaryModal')closeDiaryModal();});
+  const ta=$('#diaryContent');
+  if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();const lines=ta.value.split('\n');ta.value=ta.value+'\n'+(lines.length+1)+'. ';}});
+  $('#saveNotesBtn').onclick=saveNotes;
+  $('#clearNotesBtn').onclick=()=>{$('#notesContent').value='';};
+  $$('.hist-tab').forEach(b=>b.onclick=()=>switchHistTab(b.dataset.tab));
+}
+
+// ==================== 全局暴露 ====================
+window.app={
+  navCheck:o=>{vdCheck=dateOffset(vdCheck,o);renderCheck();},
+  navCheckTo:s=>{vdCheck=s;renderCheck();},
+  navEx:o=>{vdEx=dateOffset(vdEx,o);renderExercise();},
+  navExTo:s=>{vdEx=s;renderExercise();},
+  navStudy:o=>{vdStudy=dateOffset(vdStudy,o);renderStudy();},
+  navStudyTo:s=>{vdStudy=s;renderStudy();},
+  navDiary:o=>{vdDiary=dateOffset(vdDiary,o);renderDiaryList();},
+  navDiaryTo:s=>{vdDiary=s;renderDiaryList();},
+  navNotes:o=>{vdNotes=dateOffset(vdNotes,o);renderNotes();},
+  navNotesTo:s=>{vdNotes=s;renderNotes();},
+  navHist:o=>{vdHist=dateOffset(vdHist,o);renderHistory();},
+  navHistTo:s=>{vdHist=s;renderHistory();},
+  navHistWeek:o=>{vdHistWeek=dateOffset(vdHistWeek,o*7);renderWeekStat();},
+  navHistWeekTo:s=>{vdHistWeek=s;renderWeekStat();},
+  navHistMonth:o=>{const d=new Date(vdHistMonth+'T00:00:00');d.setMonth(d.getMonth()+o);vdHistMonth=dateStr(d);renderMonthStat();},
+  navHistMonthTo:s=>{vdHistMonth=s;renderMonthStat();},
+  deleteCheckItem:(date,key,e)=>{e.stopPropagation();deleteCheck(date,key);renderAll();},
+  completeEx:(date,idx)=>{
+    const ex=getEx(date),e=ex.find((x,i)=>i===idx&&!x.done);
+    if(!e)return;
+    const t=findExType(e.type);
+    t.fields.forEach(f=>{e.detail[f.key]=f.type==='range'?parseInt($('#exf_'+idx+'_'+f.key).value):(parseInt($('#exf_'+idx+'_'+f.key).value)||0);});
+    e.done=true;e.tmpId=Date.now();setEx(date,ex);renderAll();
+  },
+  cancelEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderExercise();},
+  deleteEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderAll();},
+  deleteReadRecord:(date,min)=>{const r=confirm('确认删除阅读记录 '+min+' 分钟？');if(r){deleteReadMin(date,min);renderAll();}},
+  deleteDuoRecord:(date)=>{if(confirm('确认删除多邻国记录？')){deleteDuo(date);renderAll();}},
+  deleteDiaryItem:(id)=>{if(confirm('确认删除这条日记？')){deleteDiary(id);renderAll();}},
+  deleteNotesItem:(id)=>{if(confirm('确认删除这条随笔？')){deleteNotes(id);renderAll();}}
+};
+
+// ==================== 初始化 ====================
+bindAll();switchPanel('overview');renderAll();setInterval(()=>renderAll(),60000);
+
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>
