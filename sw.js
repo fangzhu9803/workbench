@@ -1,4 +1,4 @@
-const C = "workbench-v2";
+const C = "workbench-v3";
 const ASSETS = [
   "./",
   "./index.html",
