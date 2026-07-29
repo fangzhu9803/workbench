@@ -226,14 +226,16 @@ textarea{resize:none;}
     </div>
     <div id="studyHistoryHint" class="mb-2 text-xs text-amber-300"></div>
     <div class="card p-4 mb-3" style="border-top:4px solid #fbbf24;">
-      <div class="flex gap-2 mb-4">
-        <button class="book-tab active" data-tab="reading" onclick="switchBookTab('reading')">📚 在读</button>
-        <button class="book-tab" data-tab="finished" onclick="switchBookTab('finished')">🏆 已读完</button>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2">
+          <button class="book-tab active" data-tab="reading" onclick="switchBookTab('reading')">📚 在读</button>
+          <button class="book-tab" data-tab="finished" onclick="switchBookTab('finished')">🏆 已读完</button>
+        </div>
+        <button class="setting-btn" id="bookSettingBtn" onclick="toggleBookMgmt()">➕</button>
       </div>
       <div id="bookReadingArea"></div>
       <div id="bookFinishedArea" class="hidden"></div>
-      <div class="mt-4 pt-3 border-t border-slate-100">
-        <p class="text-xs font-medium text-slate-500 mb-2">添加新书</p>
+      <div id="bookMgmtArea" class="mgmt-panel">
         <div class="flex gap-2 mb-2">
           <input id="newBookName" type="text" placeholder="书名" class="flex-1 px-3 py-2 rounded-lg border border-amber-100 text-sm focus:outline-none focus:border-amber-300">
           <select id="newBookStatus" class="px-2 py-2 rounded-lg border border-amber-100 text-sm bg-white">
@@ -396,6 +398,8 @@ textarea{resize:none;}
   <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="history"><span class="text-lg">📋</span><span>历史</span></button>
 </div>
 
+<canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+
 <div id="diaryModal" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
   <div class="card w-full max-w-md p-5" style="border-top:4px solid #c4b5fd;">
     <div class="flex items-center justify-between mb-3">
@@ -447,9 +451,11 @@ function getCheckItems(){return load('checkItems',DEFAULT_CHECKS);}
 function setCheckItems(v){save('checkItems',v);}
 function getChecks(date){const r=load('checkRecords',{});return r[date]||{};}
 function setChecks(date,v){const r=load('checkRecords',{});r[date]=v;save('checkRecords',r);}
-function toggleCheck(date,key){const c=getChecks(date);c[key]=!c[key];setChecks(date,c);}
+function toggleCheck(date,key){const c=getChecks(date);c[key]=!c[key];setChecks(date,c);if(c[key])confetti();}
 let checkMgmtOpen=false;
 function toggleCheckMgmt(){checkMgmtOpen=!checkMgmtOpen;$('#checkinRecords').classList.toggle('open',checkMgmtOpen);$('#checkSettingBtn').classList.toggle('open',checkMgmtOpen);renderCheckMgmt();}
+let bookMgmtOpen=false;
+function toggleBookMgmt(){bookMgmtOpen=!bookMgmtOpen;$('#bookMgmtArea').classList.toggle('open',bookMgmtOpen);$('#bookSettingBtn').classList.toggle('open',bookMgmtOpen);}
 function renderCheckMgmt(){
   const items=getCheckItems();
   let mgmt='<div class="card p-4"><div class="flex items-center justify-between mb-3"><span class="text-sm font-medium text-slate-600">管理打卡项</span></div>';
@@ -548,7 +554,7 @@ function addBook(){
   renderStudy();
 }
 function deleteBook(id){if(!confirm('确认删除这本书？'))return;setBooks(getBooks().filter(b=>b.id!==id));renderStudy();}
-function toggleBookStatus(id){const books=getBooks();const b=books.find(x=>x.id===id);if(b){b.status=b.status==='reading'?'finished':'reading';setBooks(books);renderStudy();}}
+function toggleBookStatus(id){const books=getBooks();const b=books.find(x=>x.id===id);if(b){const wasReading=b.status==='reading';b.status=b.status==='reading'?'finished':'reading';setBooks(books);renderStudy();if(wasReading&&b.status==='finished')confetti();}}
 function addBookMinutes(id,min){const books=getBooks();const b=books.find(x=>x.id===id);if(b){b.minutes=(b.minutes||0)+min;setBooks(books);}}
 function switchBookTab(tab){bookTab=tab;$$('.book-tab').forEach(b=>{b.classList.toggle('active',b.dataset.tab===tab);});$('#bookReadingArea').classList.toggle('hidden',tab!=='reading');$('#bookFinishedArea').classList.toggle('hidden',tab!=='finished');}
 function getDuo(){return load('duoRecords',{});}
@@ -916,6 +922,80 @@ function bindAll(){
   $('#saveNotesBtn').onclick=saveNotes;
   $('#clearNotesBtn').onclick=()=>{$('#notesContent').value='';};
 }
+// ==================== 撒花特效 ====================
+let confettiAnim=null;
+function confetti(){
+  const canvas=$('#confettiCanvas');
+  if(!canvas)return;
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const colors=['#fda4af','#fdba74','#fde047','#86efac','#7dd3fc','#c4b5fd','#f472b6','#fbbf24'];
+  const shapes=['rect','circle','star'];
+  const N=80;
+  let particles=[];
+  for(let i=0;i<N;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:-20-Math.random()*200,
+      vx:(Math.random()-0.5)*6,
+      vy:Math.random()*4+3,
+      size:Math.random()*8+4,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      shape:shapes[Math.floor(Math.random()*shapes.length)],
+      rot:Math.random()*360,
+      vr:(Math.random()-0.5)*15,
+      life:1
+    });
+  }
+  let frame=0;
+  if(confettiAnim)cancelAnimationFrame(confettiAnim);
+  function tick(){
+    frame++;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    particles.forEach(p=>{
+      if(p.y>canvas.height+40)return;
+      alive=true;
+      p.x+=p.vx;p.y+=p.vy;
+      p.vy+=0.15; // gravity
+      p.vx*=0.99;
+      p.rot+=p.vr;
+      if(p.y>canvas.height*0.7)p.life-=0.012;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha=Math.max(0,p.life);
+      ctx.fillStyle=p.color;
+      if(p.shape==='circle'){
+        ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();
+      }else if(p.shape==='rect'){
+        ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      }else{
+        // star
+        ctx.beginPath();
+        for(let s=0;s<5;s++){
+          const a=(s*144-90)*Math.PI/180;
+          const r=s%2===0?p.size/2:p.size/4;
+          const px=Math.cos(a)*r,py=Math.sin(a)*r;
+          if(s===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+        }
+        ctx.closePath();ctx.fill();
+      }
+      ctx.restore();
+    });
+    if(alive && frame<400){
+      confettiAnim=requestAnimationFrame(tick);
+    }else{
+      canvas.style.display='none';
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      confettiAnim=null;
+    }
+  }
+  tick();
+}
+
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ==================== 全局暴露 ====================
@@ -948,7 +1028,7 @@ window.app={
     const ex=getEx(date),e=ex.find((x,i)=>i===idx&&!x.done);
     if(!e)return;const t=findExType(e.type);
     t.fields.forEach(f=>{e.detail[f.key]=f.type==='range'?parseInt($('#exf_'+idx+'_'+f.key).value):(parseInt($('#exf_'+idx+'_'+f.key).value)||0);});
-    e.done=true;setEx(date,ex);renderAll();
+    e.done=true;setEx(date,ex);renderAll();confetti();
   },
   cancelEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderExercise();},
   deleteEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderAll();},
