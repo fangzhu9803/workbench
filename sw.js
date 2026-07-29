@@ -1,10 +1,8 @@
-const C = "workbench-v6";
+const C = "workbench-v7-preview";
 const ASSETS = [
   "./",
   "./index.html",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png"
+  "./manifest.json"
 ];
 self.addEventListener("install", e => {
   self.skipWaiting();
