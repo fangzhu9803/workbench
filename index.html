@@ -15,27 +15,38 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root{
-  --c-bg:#fefdfb;
-  --c-card:#fff;
-  --c-text:#475569;
-  --c-purple:#d8b4fe;
-  --c-pink:#fda4af;
-  --c-orange:#fdba74;
-  --c-yellow:#fde047;
-  --c-green:#86efac;
-  --c-blue:#7dd3fc;
-  --c-lavender:#c4b5fd;
+  --c-bg:#fffbf7;
+  --c-card:#ffffff;
+  --c-text:#5a5a72;
+  --c-purple:#e9d5ff;
+  --c-pink:#fecdd3;
+  --c-orange:#fed7aa;
+  --c-yellow:#fef08a;
+  --c-green:#bbf7d0;
+  --c-blue:#bae6fd;
+  --c-lavender:#ddd6fe;
+  --c-rose:#fecdd3;
+  --c-mint:#c8f6d8;
+  --c-sky:#d0f0fd;
 }
 html,body{-webkit-tap-highlight-color:transparent;overflow:hidden;height:100%;}
 body{background:var(--c-bg);color:var(--c-text);}
-.sidebar{background:#fff;border-right:1px solid #f1f5f9;transition:width .2s;}
-.sidebar-item{transition:all .15s;border-radius:12px;margin:0 8px;}
-.sidebar-item.active{background:#f3e8ff;color:#9333ea;}
-.sidebar-item:hover{background:#faf5ff;}
-.main-panel{background:linear-gradient(180deg,#fff8fb 0%,#fffdf5 30%,#f5fffa 65%,#f0f9ff 100%);}
-.panel-section{animation:fade .25s ease;}
+.main-panel{background:linear-gradient(180deg,#fff8fb 0%,#fffdf5 25%,#f5fffa 55%,#f0f9ff 100%);padding-left:52px;}
+.panel-section{animation:fade .25s ease;position:relative;}
+.decor{position:absolute;pointer-events:none;z-index:0;}
 @keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-.card{background:var(--c-card);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04);}
+.card{position:relative;z-index:1;background:var(--c-card);border-radius:22px;box-shadow:0 6px 24px rgba(0,0,0,.04);border:1px solid rgba(255,255,255,.9);}
+
+/* 装饰插画 */
+.doodle{position:absolute;pointer-events:none;z-index:0;opacity:.85;}
+.doodle-sm{width:40px;height:40px;}
+.doodle-md{width:70px;height:70px;}
+.doodle-lg{width:110px;height:110px;}
+.doodle-rotate-12{transform:rotate(12deg);}
+.doodle-rotate-n12{transform:rotate(-12deg);}
+.doodle-rotate-6{transform:rotate(6deg);}
+.doodle-rotate-n6{transform:rotate(-6deg);}
+.panel-header{position:relative;z-index:1;}
 
 /* 创意打卡圆圈 */
 .check-circle{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);border:2.5px solid #e2e8f0;background:#fff;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.06);}
@@ -98,16 +109,16 @@ textarea{resize:none;}
 .diary-time{flex-shrink:0;padding:10px 14px 10px 4px;font-size:10px;color:#94a3b8;}
 
 /* 左侧可收起 Tab */
-.side-tabs{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-radius:0 18px 18px 0;box-shadow:2px 0 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04);border-left:none;transition:transform .25s ease;}
-.side-tabs.collapsed{transform:translate(calc(-100% + 24px),-50%);}
+.side-tabs{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:8px;padding:10px 8px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 8px 32px rgba(147,51,234,.10),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.8);transition:transform .25s ease;}
+.side-tabs.collapsed{transform:translate(calc(-100% + 18px),-50%);}
 .side-tabs.collapsed .side-tab-label{display:none;}
-.side-tabs.collapsed .side-tab{justify-content:center;padding:8px 2px;}
-.side-tabs .side-tab-btn{position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:20px;height:48px;border-radius:0 10px 10px 0;background:rgba(255,255,255,.92);border:1px solid rgba(0,0,0,.04);border-left:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;font-size:10px;box-shadow:4px 0 10px rgba(0,0,0,.06);}
-.side-tab{display:flex;align-items:center;gap:2px;padding:6px 10px;border-radius:12px;cursor:pointer;transition:all .15s;color:#94a3b8;font-size:11px;}
-.side-tab.active{background:#f3e8ff;color:#9333ea;}
-.side-tab:hover{background:#faf5ff;}
-.main-panel{padding-left:64px;}
-@media(min-width:768px){.side-tabs{display:none;}.main-panel{padding-left:0;}}
+.side-tabs.collapsed .side-tab{justify-content:center;padding:9px 3px;}
+.side-tabs .side-tab-btn{position:absolute;right:-13px;top:50%;transform:translateY(-50%);width:22px;height:50px;border-radius:0 12px 12px 0;background:rgba(255,255,255,.9);border:1px solid rgba(147,51,234,.08);border-left:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#c4b5fd;font-size:12px;box-shadow:4px 0 12px rgba(147,51,234,.08);transition:all .2s;}
+.side-tabs.collapsed .side-tab-btn{transform:translateY(-50%) rotate(180deg);}
+.side-tab{display:flex;align-items:center;gap:6px;padding:9px 11px;border-radius:14px;cursor:pointer;transition:all .15s;color:#94a3b8;font-size:12px;font-weight:500;background:rgba(255,255,255,.5);}
+.side-tab.active{background:linear-gradient(135deg,#f3e8ff,#ede9fe);color:#7c3aed;box-shadow:0 2px 8px rgba(147,51,234,.12);}
+.side-tab:hover{background:#faf5ff;transform:translateX(2px);}
+.side-tab span:first-child{font-size:18px;}
 
 .date-nav{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .date-nav:hover{background:#f8fafc;color:#475569;}
@@ -146,30 +157,17 @@ textarea{resize:none;}
 </head>
 <body class="font-sans h-full">
 
-<div class="flex h-full">
-<nav class="sidebar-desktop sidebar w-[200px] flex-shrink-0 flex flex-col overflow-y-auto">
-  <div class="px-5 pt-5 pb-3"><h1 class="text-lg font-bold text-violet-500">工作台</h1><div id="todayDateSidebar" class="text-xs text-slate-400 mt-1"></div></div>
-  <div class="flex-1 px-2 space-y-1" id="navList">
-    <button class="sidebar-item active w-full flex items-center gap-3 px-3 py-2 text-sm font-medium" data-panel="overview"><span>📊</span><span>总览</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="checkin"><span>✅</span><span>每日打卡</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="exercise"><span>🏃</span><span>运动计划</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="study"><span>📖</span><span>学习追踪</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="diary"><span>✍️</span><span>写日记</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="notes"><span>📝</span><span>随笔</span></button>
-    <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-500" data-panel="history"><span>📋</span><span>历史记录</span></button>
-  </div>
-  <div class="px-5 pb-4 pt-3 border-t border-slate-100">
-    <div class="flex items-center justify-between text-sm"><span class="text-amber-500 font-medium">🔥 <span id="streakDays">0</span> 天</span><span class="font-bold text-violet-400" id="completionPct">0%</span></div>
-    <div class="mt-2 progress-track h-2 rounded-full overflow-hidden"><div id="completionBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:linear-gradient(90deg,#fda4af,#fde047,#86efac,#7dd3fc,#c4b5fd)"></div></div>
-  </div>
-</nav>
-
 <main class="main-panel flex-1 overflow-y-auto" id="mainContent">
 
   <!-- 总览 -->
   <div id="panel-overview" class="panel-section p-5 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold text-violet-500 mb-1">今日总览</h2>
-    <p id="todayDateMain" class="text-sm text-slate-400 mb-4"></p>
+    <!-- 装饰插画 -->
+    <svg class="doodle doodle-md" style="top:12px;right:20px;" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="14" fill="#fef08a"/><path d="M40 12c-2 10-4 18 0 26" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M40 12c2 10 4 18 0 26" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M12 40c10-2 18-4 26 0" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M12 40c10 2 18 4 26 0" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M68 40c-10-2-18-4-26 0" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M68 40c-10 2-18 4-26 0" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M40 68c-2-10-4-18 0-26" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/><path d="M40 68c2-10 4-18 0-26" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:90px;left:8px;" viewBox="0 0 40 40" fill="none"><path d="M20 34c0-14 6-20 6-20s-2 8-6 8-6-8-6-8 6 6 6 20Z" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="12" r="4" fill="#fde047"/></svg>
+    <div class="panel-header">
+      <h2 class="text-xl font-bold text-violet-500 mb-1">今日总览</h2>
+      <p id="todayDateMain" class="text-sm text-slate-400 mb-4"></p>
+    </div>
     <div class="card p-4 mb-4" style="border-top:4px solid #c4b5fd;">
       <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-500">完成度</span><span class="text-2xl font-bold text-violet-500" id="completionPctMain">0%</span></div>
       <div class="progress-track h-3 rounded-full overflow-hidden"><div id="completionBarMain" class="h-full rounded-full transition-all duration-500" style="width:0%;background:linear-gradient(90deg,#fda4af,#fde047,#86efac,#7dd3fc,#c4b5fd)"></div></div>
@@ -187,7 +185,9 @@ textarea{resize:none;}
 
   <!-- 每日打卡 -->
   <div id="panel-checkin" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <div class="flex items-center justify-between mb-4">
+    <svg class="doodle doodle-md" style="top:18px;right:14px;" viewBox="0 0 80 80" fill="none"><path d="M40 60c-12 0-20-10-20-22s10-22 22-22 20 10 20 22-10 22-22 22Z" fill="#fecdd3" stroke="#fda4af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="30" cy="34" r="3" fill="#475569"/><circle cx="50" cy="34" r="3" fill="#475569"/><path d="M36 46c2 3 8 3 10 0" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:100px;left:4px;" viewBox="0 0 40 40" fill="none"><path d="M20 6c2 6 4 10 8 14-6 0-10 2-14 6 0-6-2-10-6-14 6 0 10-2 12-6Z" fill="#fde047" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/></svg>
+    <div class="panel-header flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold" style="color:#e11d48;">每日必做</h2>
       <button class="setting-btn" id="checkSettingBtn" onclick="toggleCheckMgmt()">⚙️</button>
     </div>
@@ -205,7 +205,9 @@ textarea{resize:none;}
 
   <!-- 运动计划 -->
   <div id="panel-exercise" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <div class="flex items-center justify-between mb-4">
+    <svg class="doodle doodle-md" style="top:14px;right:18px;" viewBox="0 0 80 80" fill="none"><circle cx="55" cy="25" r="10" fill="#fef08a"/><path d="M45 35c-8 6-18 8-28 4" stroke="#86efac" stroke-width="3" stroke-linecap="round"/><path d="M45 45c-10 4-20 2-26-6" stroke="#86efac" stroke-width="3" stroke-linecap="round"/><path d="M20 55c4 6 14 8 22 2" stroke="#86efac" stroke-width="3" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:100px;left:4px;" viewBox="0 0 40 40" fill="none"><path d="M20 34V20" stroke="#86efac" stroke-width="2.5" stroke-linecap="round"/><path d="M20 24c-6-4-10-2-14 2 4 2 10 0 14-2Z" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="12" r="4" fill="#fecdd3"/></svg>
+    <div class="panel-header flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold" style="color:#16a34a;">今日运动</h2>
       <button class="setting-btn" id="exSettingBtn" onclick="toggleExMgmt()">⚙️</button>
     </div>
@@ -222,9 +224,12 @@ textarea{resize:none;}
     <div id="exRecordsArea" class="mt-3 space-y-2"></div>
     <div id="exMgmtArea" class="mgmt-panel"></div>
     <div id="weekExerciseStat" class="mt-4 text-sm font-medium" style="color:#16a34a;"></div>
-    <div class="card p-4 mt-4" style="border-top:4px solid #86efac;">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-green-600">🧭 体重月历</h3>
+    <div class="card p-4 mt-4 weight-calendar-card" style="border-top:4px solid #86efac;position:relative;overflow:hidden;">
+      <!-- 夏日植物插画装饰 -->
+      <svg class="doodle" style="top:-10px;right:-10px;width:120px;height:120px;opacity:.9;" viewBox="0 0 120 120" fill="none"><path d="M95 95c-15-8-25-24-25-42 0-18 10-34 25-42" stroke="#86efac" stroke-width="3" stroke-linecap="round"/><path d="M70 53c10-8 22-8 32 0" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linejoin="round"/><path d="M70 75c12 6 26 6 38 0" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linejoin="round"/><circle cx="86" cy="40" r="8" fill="#fde047"/><circle cx="78" cy="30" r="5" fill="#fecdd3"/><circle cx="96" cy="34" r="5" fill="#d0f0fd"/></svg>
+      <svg class="doodle" style="bottom:-6px;left:-8px;width:90px;height:90px;opacity:.9;" viewBox="0 0 90 90" fill="none"><path d="M45 78V45" stroke="#86efac" stroke-width="3" stroke-linecap="round"/><path d="M45 55c-10-8-20-6-28 4 8 4 18 2 28-4Z" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linejoin="round"/><path d="M45 40c10-10 20-12 30-2-10 2-20 6-30 2Z" fill="#bbf7d0" stroke="#86efac" stroke-width="2" stroke-linejoin="round"/><path d="M45 25c-6-8-6-18 2-24 4 8 2 18-2 24Z" fill="#fde047" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/></svg>
+      <div class="flex items-center justify-between mb-3" style="position:relative;z-index:1;">
+        <h3 class="text-sm font-semibold text-green-600">🌿 体重月历</h3>
         <div class="flex items-center gap-2">
           <button class="date-nav" onclick="app.navWeightMonth(-1)">←</button>
           <span id="weightMonthDisplay" class="text-sm font-semibold text-green-600"></span>
@@ -232,7 +237,7 @@ textarea{resize:none;}
           <button class="px-2 py-1 rounded-lg text-xs bg-green-50 text-green-500 border border-green-100 font-medium" onclick="app.navWeightMonthTo(todayStr())">本月</button>
         </div>
       </div>
-      <div class="grid grid-cols-7 gap-1 text-center mb-2">
+      <div class="grid grid-cols-7 gap-1 text-center mb-2" style="position:relative;z-index:1;">
         <div class="text-xs text-slate-400 py-1">日</div>
         <div class="text-xs text-slate-400 py-1">一</div>
         <div class="text-xs text-slate-400 py-1">二</div>
@@ -241,8 +246,8 @@ textarea{resize:none;}
         <div class="text-xs text-slate-400 py-1">五</div>
         <div class="text-xs text-slate-400 py-1">六</div>
       </div>
-      <div id="weightCalendar" class="grid grid-cols-7 gap-1"></div>
-      <div class="mt-3 flex gap-2">
+      <div id="weightCalendar" class="grid grid-cols-7 gap-1" style="position:relative;z-index:1;"></div>
+      <div class="mt-3 flex gap-2" style="position:relative;z-index:1;">
         <input id="weightInput" type="number" step="0.1" placeholder="今日体重 kg" class="flex-1 px-3 py-2 rounded-lg border border-green-100 text-sm focus:outline-none focus:border-green-300">
         <button class="px-4 py-2 rounded-lg bg-green-100 text-green-600 text-sm font-medium hover:bg-green-200 transition" onclick="saveWeight()">记录</button>
       </div>
@@ -251,7 +256,11 @@ textarea{resize:none;}
 
   <!-- 学习追踪 -->
   <div id="panel-study" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold text-amber-500 mb-4">学习追踪</h2>
+    <svg class="doodle doodle-md" style="top:16px;right:14px;" viewBox="0 0 80 80" fill="none"><path d="M20 60c0-16 12-28 28-28s28 12 28 28" fill="#fde68a" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 40c4-10 14-16 24-16" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/><circle cx="40" cy="28" r="6" fill="#fdba74"/></svg>
+    <svg class="doodle doodle-sm" style="top:110px;left:6px;" viewBox="0 0 40 40" fill="none"><path d="M8 32l8-16 8 16H8Z" fill="#d0f0fd" stroke="#7dd3fc" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="10" r="3" fill="#c4b5fd"/></svg>
+    <div class="panel-header">
+      <h2 class="text-xl font-bold text-amber-500 mb-4">学习追踪</h2>
+    </div>
     <div class="flex items-center gap-3 mb-4">
       <button class="date-nav" onclick="app.navStudy(-1)">←</button>
       <span id="studyDateDisplay" class="text-sm font-semibold text-amber-500"></span>
@@ -290,7 +299,11 @@ textarea{resize:none;}
 
   <!-- 写日记 -->
   <div id="panel-diary" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold text-violet-500 mb-4">写日记</h2>
+    <svg class="doodle doodle-md" style="top:16px;right:16px;" viewBox="0 0 80 80" fill="none"><path d="M55 20c10 6 16 18 12 30" stroke="#c4b5fd" stroke-width="3" stroke-linecap="round"/><path d="M25 50c-6-10-4-22 6-30" stroke="#c4b5fd" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="45" r="12" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="2.5"/><path d="M34 45h12M40 39v12" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:100px;left:4px;" viewBox="0 0 40 40" fill="none"><path d="M20 6c4 8 8 14 16 18-8 2-14 6-18 14-2-8-6-14-14-18 8-2 14-6 16-14Z" fill="#fde047" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/></svg>
+    <div class="panel-header">
+      <h2 class="text-xl font-bold text-violet-500 mb-4">写日记</h2>
+    </div>
     <div class="flex gap-2 mb-4">
       <button class="diary-view-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-100 text-violet-600" data-view="day">日记录</button>
       <button class="diary-view-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-50 text-violet-400 border border-violet-100" data-view="week">周统计</button>
@@ -339,7 +352,11 @@ textarea{resize:none;}
 
   <!-- 随笔 -->
   <div id="panel-notes" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold text-sky-500 mb-4">随笔</h2>
+    <svg class="doodle doodle-md" style="top:18px;right:14px;" viewBox="0 0 80 80" fill="none"><path d="M55 20c8 6 12 16 8 26" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/><path d="M25 46c-4-10 0-22 10-28" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/><rect x="28" y="34" width="30" height="36" rx="4" fill="#d0f0fd" stroke="#7dd3fc" stroke-width="2.5"/><path d="M34 44h18M34 52h14M34 60h10" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:105px;left:6px;" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" fill="#fef08a" stroke="#fbbf24" stroke-width="2"/><path d="M20 6v6M20 28v6M6 20h6M28 20h6" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/></svg>
+    <div class="panel-header">
+      <h2 class="text-xl font-bold text-sky-500 mb-4">随笔</h2>
+    </div>
     <div class="flex gap-2 mb-4">
       <button class="notes-view-tab px-4 py-2 rounded-xl text-sm font-medium bg-sky-100 text-sky-600" data-view="day">日记录</button>
       <button class="notes-view-tab px-4 py-2 rounded-xl text-sm font-medium bg-sky-50 text-sky-400 border border-sky-100" data-view="week">周统计</button>
@@ -384,7 +401,11 @@ textarea{resize:none;}
 
   <!-- 历史记录 -->
   <div id="panel-history" class="panel-section hidden p-5 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold text-violet-500 mb-4">历史记录</h2>
+    <svg class="doodle doodle-md" style="top:16px;right:14px;" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="18" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="2.5"/><path d="M40 28v14l10 6" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/><path d="M22 20c4-4 10-4 14 0" stroke="#fda4af" stroke-width="2.5" stroke-linecap="round"/><path d="M58 20c4-4 10-4 14 0" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <svg class="doodle doodle-sm" style="top:100px;left:6px;" viewBox="0 0 40 40" fill="none"><path d="M20 34c-8 0-14-6-14-14 0-6 4-10 10-10 6 0 10 4 10 10 0 8-6 14-6 14Z" fill="#fecdd3" stroke="#fda4af" stroke-width="2" stroke-linejoin="round"/></svg>
+    <div class="panel-header">
+      <h2 class="text-xl font-bold text-violet-500 mb-4">历史记录</h2>
+    </div>
     <div class="flex gap-2 mb-4">
       <button class="hist-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-100 text-violet-600" data-tab="day">日记录</button>
       <button class="hist-tab px-4 py-2 rounded-xl text-sm font-medium bg-violet-50 text-violet-400 border border-violet-100" data-tab="week">周统计</button>
@@ -420,7 +441,6 @@ textarea{resize:none;}
   </div>
 
 </main>
-</div>
 
 <div class="side-tabs" id="sideTabs">
   <button class="side-tab-btn" onclick="toggleSideTabs()">›</button>
@@ -929,7 +949,7 @@ function calcCompletion(){
 }
 function renderHeader(){
   const d=new Date();const w=['日','一','二','三','四','五','六'];const ds=(d.getMonth()+1)+'月'+d.getDate()+'日 周'+w[d.getDay()];
-  $('#todayDateSidebar').textContent=ds;$('#todayDateMain').textContent=ds;
+  $('#todayDateMain').textContent=ds;
   const pct=calcCompletion(),streak=calcStreak();
   $('#completionPct').textContent=pct+'%';$('#completionBar').style.width=pct+'%';
   $('#streakDays').textContent=streak;$('#completionPctMain').textContent=pct+'%';
@@ -978,7 +998,6 @@ function toggleSideTabs(){$('#sideTabs').classList.toggle('collapsed');}
 function switchPanel(name){
   $$('.panel-section').forEach(p=>p.classList.add('hidden'));
   $('#panel-'+name).classList.remove('hidden');
-  $$('.sidebar-item').forEach(b=>{b.classList.remove('active');b.classList.add('text-slate-500');if(b.dataset.panel===name){b.classList.add('active');b.classList.remove('text-slate-500');}});
   $$('.side-tab').forEach(b=>{b.classList.remove('active');if(b.dataset.panel===name)b.classList.add('active');});
   $('#mainContent').scrollTop=0;
 }
@@ -986,7 +1005,6 @@ function renderAll(){renderHeader();renderQuickCheck();renderOverviewStatus();re
 
 // ==================== 事件绑定 ====================
 function bindAll(){
-  $$('.sidebar-item').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
   $$('.side-tab').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
   $$('.diary-btn').forEach(b=>b.onclick=()=>openDiaryModal(b.dataset.type));
   $$('.diary-filter').forEach(b=>b.onclick=()=>{diaryFilter=b.dataset.filter;$$('.diary-filter').forEach(x=>{x.classList.remove('bg-violet-100','text-violet-600');x.classList.add('bg-violet-50','text-violet-400','border','border-violet-100');});b.classList.add('bg-violet-100','text-violet-600');b.classList.remove('bg-violet-50','text-violet-400','border','border-violet-100');renderDiaryList();});
