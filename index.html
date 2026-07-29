@@ -97,8 +97,17 @@ textarea{resize:none;}
 .diary-text{flex:1;padding:10px 14px 10px 6px;font-size:13px;color:#475569;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
 .diary-time{flex-shrink:0;padding:10px 14px 10px 4px;font-size:10px;color:#94a3b8;}
 
-.bottom-tabs{display:none;}
-@media(max-width:767px){.sidebar-desktop{display:none!important;}.bottom-tabs{display:flex!important;}.main-panel{margin-bottom:54px;}}
+/* 左侧可收起 Tab */
+.side-tabs{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-radius:0 18px 18px 0;box-shadow:2px 0 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04);border-left:none;transition:transform .25s ease;}
+.side-tabs.collapsed{transform:translate(calc(-100% + 24px),-50%);}
+.side-tabs.collapsed .side-tab-label{display:none;}
+.side-tabs.collapsed .side-tab{justify-content:center;padding:8px 2px;}
+.side-tabs .side-tab-btn{position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:20px;height:48px;border-radius:0 10px 10px 0;background:rgba(255,255,255,.92);border:1px solid rgba(0,0,0,.04);border-left:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;font-size:10px;box-shadow:4px 0 10px rgba(0,0,0,.06);}
+.side-tab{display:flex;align-items:center;gap:2px;padding:6px 10px;border-radius:12px;cursor:pointer;transition:all .15s;color:#94a3b8;font-size:11px;}
+.side-tab.active{background:#f3e8ff;color:#9333ea;}
+.side-tab:hover{background:#faf5ff;}
+.main-panel{padding-left:64px;}
+@media(min-width:768px){.side-tabs{display:none;}.main-panel{padding-left:0;}}
 
 .date-nav{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .date-nav:hover{background:#f8fafc;color:#475569;}
@@ -213,6 +222,31 @@ textarea{resize:none;}
     <div id="exRecordsArea" class="mt-3 space-y-2"></div>
     <div id="exMgmtArea" class="mgmt-panel"></div>
     <div id="weekExerciseStat" class="mt-4 text-sm font-medium" style="color:#16a34a;"></div>
+    <div class="card p-4 mt-4" style="border-top:4px solid #86efac;">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-green-600">🧭 体重月历</h3>
+        <div class="flex items-center gap-2">
+          <button class="date-nav" onclick="app.navWeightMonth(-1)">←</button>
+          <span id="weightMonthDisplay" class="text-sm font-semibold text-green-600"></span>
+          <button class="date-nav" onclick="app.navWeightMonth(1)">→</button>
+          <button class="px-2 py-1 rounded-lg text-xs bg-green-50 text-green-500 border border-green-100 font-medium" onclick="app.navWeightMonthTo(todayStr())">本月</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center mb-2">
+        <div class="text-xs text-slate-400 py-1">日</div>
+        <div class="text-xs text-slate-400 py-1">一</div>
+        <div class="text-xs text-slate-400 py-1">二</div>
+        <div class="text-xs text-slate-400 py-1">三</div>
+        <div class="text-xs text-slate-400 py-1">四</div>
+        <div class="text-xs text-slate-400 py-1">五</div>
+        <div class="text-xs text-slate-400 py-1">六</div>
+      </div>
+      <div id="weightCalendar" class="grid grid-cols-7 gap-1"></div>
+      <div class="mt-3 flex gap-2">
+        <input id="weightInput" type="number" step="0.1" placeholder="今日体重 kg" class="flex-1 px-3 py-2 rounded-lg border border-green-100 text-sm focus:outline-none focus:border-green-300">
+        <button class="px-4 py-2 rounded-lg bg-green-100 text-green-600 text-sm font-medium hover:bg-green-200 transition" onclick="saveWeight()">记录</button>
+      </div>
+    </div>
   </div>
 
   <!-- 学习追踪 -->
@@ -388,14 +422,15 @@ textarea{resize:none;}
 </main>
 </div>
 
-<div class="bottom-tabs fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex justify-around py-2 z-50">
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-violet-500 text-xs" data-panel="overview"><span class="text-lg">📊</span><span>总览</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="checkin"><span class="text-lg">✅</span><span>打卡</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="exercise"><span class="text-lg">🏃</span><span>运动</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="study"><span class="text-lg">📖</span><span>学习</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="diary"><span class="text-lg">✍️</span><span>日记</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="notes"><span class="text-lg">📝</span><span>随笔</span></button>
-  <button class="bottom-tab flex flex-col items-center gap-0.5 text-slate-400 text-xs" data-panel="history"><span class="text-lg">📋</span><span>历史</span></button>
+<div class="side-tabs" id="sideTabs">
+  <button class="side-tab-btn" onclick="toggleSideTabs()">›</button>
+  <button class="side-tab active" data-panel="overview"><span>📊</span><span class="side-tab-label">总览</span></button>
+  <button class="side-tab" data-panel="checkin"><span>✅</span><span class="side-tab-label">打卡</span></button>
+  <button class="side-tab" data-panel="exercise"><span>🏃</span><span class="side-tab-label">运动</span></button>
+  <button class="side-tab" data-panel="study"><span>📖</span><span class="side-tab-label">学习</span></button>
+  <button class="side-tab" data-panel="diary"><span>✍️</span><span class="side-tab-label">日记</span></button>
+  <button class="side-tab" data-panel="notes"><span>📝</span><span class="side-tab-label">随笔</span></button>
+  <button class="side-tab" data-panel="history"><span>📋</span><span class="side-tab-label">历史</span></button>
 </div>
 
 <canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
@@ -445,6 +480,7 @@ let vdCheck=todayStr(),vdEx=todayStr(),vdStudy=todayStr(),vdDiary=todayStr(),vdN
 let vdDiaryWeek=todayStr(),vdDiaryMonth=todayStr(),vdNotesWeek=todayStr(),vdNotesMonth=todayStr();
 let diaryFilter='all',diaryModalType='success',diaryView='day',notesView='day',histTab='day',bookTab='reading';
 let vdHistWeek=todayStr(),vdHistMonth=todayStr();
+let vdWeightMonth=todayStr();
 
 // ==================== 打卡 ====================
 function getCheckItems(){return load('checkItems',DEFAULT_CHECKS);}
@@ -536,6 +572,47 @@ function renderExercise(){
 function getActualIdx(date,e){return getEx(date).findIndex(x=>x===e);}
 function addExType(){const emoji=$('#newExEmoji').value.trim()||'🎯';const label=$('#newExLabel').value.trim();if(!label)return;const types=getExTypes();types.push({key:'ex'+Date.now(),label,emoji,fields:[{key:'duration',label:'时长',unit:'min',type:'number',min:0,max:300,step:5,default:30}]});setExTypes(types);$('#newExEmoji').value='';$('#newExLabel').value='';renderExercise();}
 function deleteExType(key){if(!confirm('确认删除这个运动项？历史记录不受影响。'))return;setExTypes(getExTypes().filter(i=>i.key!==key));renderExercise();}
+
+// ==================== 体重记录 ====================
+function getWeights(){return load('weightRecords',{});}
+function setWeights(v){save('weightRecords',v);}
+function saveWeight(){
+  const val=parseFloat($('#weightInput').value);
+  if(!val||val<=0||val>500)return;
+  const w=getWeights();
+  w[todayStr()]=val;
+  setWeights(w);
+  $('#weightInput').value='';
+  renderWeightCalendar();
+}
+function deleteWeight(date){if(confirm('确认删除 '+date+' 的体重记录？')){const w=getWeights();delete w[date];setWeights(w);renderWeightCalendar();}}
+function renderWeightCalendar(){
+  const d=new Date(vdWeightMonth+'T00:00:00');
+  const y=d.getFullYear(),m=d.getMonth();
+  $('#weightMonthDisplay').textContent=y+'年'+(m+1)+'月';
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const weights=getWeights();
+  let html='';
+  for(let i=0;i<firstDay;i++)html+='<div></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    const w=weights[ds];
+    const isToday=ds===todayStr();
+    let cls='rounded-lg text-center py-1 text-xs ';
+    if(isToday)cls+='ring-2 ring-green-300 ';
+    if(w){cls+='bg-green-50 border border-green-200';}
+    else{cls+='bg-slate-50 border border-slate-100';}
+    html+=`<div class="${cls}" style="min-height:42px;">`;
+    html+=`<div class="text-slate-400 text-[10px]">${day}</div>`;
+    if(w){
+      html+=`<div class="font-bold text-green-600 text-[11px]">${w}</div>`;
+      html+=`<div class="text-red-300 text-[9px] cursor-pointer mt-0.5" onclick="app.deleteWeight('${ds}')">✕</div>`;
+    }
+    html+='</div>';
+  }
+  $('#weightCalendar').innerHTML=html;
+}
 
 // ==================== 学习/书籍 ====================
 function getBooks(){return load('books',[]);}
@@ -897,19 +974,20 @@ function renderOverviewStatus(){
 }
 
 // ==================== 面板切换 ====================
+function toggleSideTabs(){$('#sideTabs').classList.toggle('collapsed');}
 function switchPanel(name){
   $$('.panel-section').forEach(p=>p.classList.add('hidden'));
   $('#panel-'+name).classList.remove('hidden');
   $$('.sidebar-item').forEach(b=>{b.classList.remove('active');b.classList.add('text-slate-500');if(b.dataset.panel===name){b.classList.add('active');b.classList.remove('text-slate-500');}});
-  $$('.bottom-tab').forEach(b=>{b.classList.remove('text-violet-500');b.classList.add('text-slate-400');if(b.dataset.panel===name){b.classList.add('text-violet-500');b.classList.remove('text-slate-400');}});
+  $$('.side-tab').forEach(b=>{b.classList.remove('active');if(b.dataset.panel===name)b.classList.add('active');});
   $('#mainContent').scrollTop=0;
 }
-function renderAll(){renderHeader();renderQuickCheck();renderOverviewStatus();renderCheck();renderExercise();renderStudy();renderDiaryList();renderNotes();renderHistory();if(histTab==='week')renderWeekStat();if(histTab==='month')renderMonthStat();}
+function renderAll(){renderHeader();renderQuickCheck();renderOverviewStatus();renderCheck();renderExercise();renderWeightCalendar();renderStudy();renderDiaryList();renderNotes();renderHistory();if(histTab==='week')renderWeekStat();if(histTab==='month')renderMonthStat();}
 
 // ==================== 事件绑定 ====================
 function bindAll(){
   $$('.sidebar-item').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
-  $$('.bottom-tab').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
+  $$('.side-tab').forEach(b=>b.onclick=()=>switchPanel(b.dataset.panel));
   $$('.diary-btn').forEach(b=>b.onclick=()=>openDiaryModal(b.dataset.type));
   $$('.diary-filter').forEach(b=>b.onclick=()=>{diaryFilter=b.dataset.filter;$$('.diary-filter').forEach(x=>{x.classList.remove('bg-violet-100','text-violet-600');x.classList.add('bg-violet-50','text-violet-400','border','border-violet-100');});b.classList.add('bg-violet-100','text-violet-600');b.classList.remove('bg-violet-50','text-violet-400','border','border-violet-100');renderDiaryList();});
   $$('.diary-view-tab').forEach(b=>b.onclick=()=>switchDiaryView(b.dataset.view));
@@ -1004,6 +1082,8 @@ window.app={
   navCheckTo:s=>{vdCheck=s;renderCheck();},
   navEx:o=>{vdEx=dateOffset(vdEx,o);renderExercise();},
   navExTo:s=>{vdEx=s;renderExercise();},
+  navWeightMonth:o=>{const d=new Date(vdWeightMonth+'T00:00:00');d.setMonth(d.getMonth()+o);vdWeightMonth=dateStr(d);renderWeightCalendar();},
+  navWeightMonthTo:s=>{vdWeightMonth=s;renderWeightCalendar();},
   navStudy:o=>{vdStudy=dateOffset(vdStudy,o);renderStudy();},
   navStudyTo:s=>{vdStudy=s;renderStudy();},
   navDiary:o=>{vdDiary=dateOffset(vdDiary,o);renderDiaryList();},
@@ -1033,6 +1113,7 @@ window.app={
   cancelEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderExercise();},
   deleteEx:(date,idx)=>{const ex=getEx(date);ex.splice(idx,1);setEx(date,ex);renderAll();},
   deleteDuoRecord:(date)=>{if(confirm('确认删除多邻国记录？')){const d=getDuo();delete d[date];setDuo(d);renderAll();}},
+  deleteWeight:(date)=>deleteWeight(date),
   deleteDiaryItem:(id)=>{if(confirm('确认删除这条日记？')){deleteDiary(id);renderAll();}},
   deleteNotesItem:(id)=>{if(confirm('确认删除这条随笔？')){deleteNotes(id);renderAll();}}
 };
