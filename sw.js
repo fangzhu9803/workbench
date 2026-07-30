@@ -1,4 +1,4 @@
-const C = "workbench-v10-deep";
+const C = "workbench-v11-clean";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 self.addEventListener("install", e => {
   self.skipWaiting();
