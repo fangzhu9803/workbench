@@ -17,14 +17,25 @@ html,body{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
   color:#2d2d3a;
-  background:#f4faf6;
+  background-color:#f7f1e1;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0 0.28  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='f'><feTurbulence type='turbulence' baseFrequency='0.018' numOctaves='3' seed='5'/><feColorMatrix values='0 0 0 0 0.96  0 0 0 0 0.94  0 0 0 0 0.85  0 0 0 0.14 0'/></filter><rect width='100%25' height='100%25' filter='url(%23f)'/></svg>");
+  background-blend-mode:multiply,normal;
+  background-attachment:fixed,fixed;
+  background-size:240px 240px,180px 180px;
 }
 /* 主面板 */
 .main-panel{position:relative;z-index:1;min-height:100vh;padding-top:12px;padding-bottom:80px;max-width:600px;margin:0 auto;padding-left:16px;padding-right:16px;}
 .panel-section{animation:fade .25s ease;padding-bottom:80px;min-height:100vh;display:none;}
 .panel-section.active{display:block;}
 @keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-.card{position:relative;z-index:1;border-radius:22px;box-shadow:0 6px 24px rgba(22,101,52,.06);background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);}
+.card{position:relative;z-index:1;border-radius:24px 18px 22px 20px/20px 22px 18px 24px;box-shadow:0 6px 24px rgba(22,101,52,.08);background:rgba(255,253,247,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);}
+.card::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.48  0 0 0 0 0.32  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
+  opacity:.45;mix-blend-mode:multiply;
+}
 .panel-header{position:relative;z-index:1;}
 
 /* 底部Tab导航 */
@@ -652,26 +663,33 @@ function openClipModal(){
   $('#clipModal').classList.add('open');
   $('#clipTextarea').value='';
   $('#clipPreview').textContent='';
-  setTimeout(()=>$('#clipTextarea').focus(),100);
+  setTimeout(()=>{
+    $('#clipTextarea').focus();
+    $('#clipTextarea').oninput=previewClipboard;
+    previewClipboard();
+  },100);
 }
 function closeClipModal(){$('#clipModal').classList.remove('open');}
 
-function processClipboard(){
-  const text=$('#clipTextarea').value.trim();
-  if(!text)return;
+// 解析剪贴板文本，返回 [{type, content}, ...]（只解析，不保存）
+function parseDiaryText(text){
   const typeMap={
     '🎉':'success','成功日记':'success','成功':'success',
     '🙏':'gratitude','感恩日记':'gratitude','感恩':'gratitude',
     '💡':'zhiji','忽而知己':'zhiji','知己':'zhiji'
   };
-  const diaries=getDiaries();
-  const now=fmtTime();
-  let count=0;
-
-  // 按日记类型标记分段
   const lines=text.split('\n');
+  const segments=[];
   let currentType=null;
   let currentLines=[];
+
+  const flush=()=>{
+    if(currentLines.length===0)return;
+    const content=currentLines.join('\n').trim();
+    if(content){
+      segments.push({type:currentType||'gratitude',content});
+    }
+  };
 
   for(const line of lines){
     const trimmed=line.trim();
@@ -683,34 +701,54 @@ function processClipboard(){
       }
     }
     if(foundType){
-      // 保存上一个段落
-      if(currentType&&currentLines.length>0){
-        const content=currentLines.join('\n').trim();
-        if(content){
-          diaries.unshift({id:Date.now()+Math.random(),date:vdDiary,type:currentType,content,time:now});
-          count++;
-        }
-      }
+      // 切到新段落前，先保存上一段
+      flush();
       currentType=foundType;
       currentLines=[];
-    }else if(currentType){
+    }else if(currentType||segments.length>0){
+      // 有明确标记的段落：收集
+      // 没有标记但已经有段落：当作上一段的延续
+      currentLines.push(line);
+    }else{
+      // 第一段就无标记：作为默认段落（兜底）
       currentLines.push(line);
     }
   }
-  // 保存最后一段
-  if(currentType&&currentLines.length>0){
-    const content=currentLines.join('\n').trim();
-    if(content){
-      diaries.unshift({id:Date.now()+Math.random(),date:vdDiary,type:currentType,content,time:now});
-      count++;
-    }
+  flush();
+  return segments;
+}
+
+function previewClipboard(){
+  const text=$('#clipTextarea').value.trim();
+  const preview=$('#clipPreview');
+  if(!text){preview.textContent='';return;}
+  const segments=parseDiaryText(text);
+  if(segments.length===0){preview.textContent='⚠️ 未识别到内容';return;}
+  const tagMap={success:'🎉 成功',gratitude:'🙏 感恩',zhiji:'💡 知己'};
+  const lines=segments.map(s=>`${tagMap[s.type]}: ${s.content.slice(0,30)}${s.content.length>30?'…':''}`);
+  preview.innerHTML=`将分发 <b>${segments.length}</b> 条到 <b>${vdDiary}</b>：<br>`+lines.join('<br>');
+}
+
+function processClipboard(){
+  const text=$('#clipTextarea').value.trim();
+  if(!text)return;
+  const segments=parseDiaryText(text);
+  if(segments.length===0){
+    $('#clipPreview').textContent='⚠️ 未识别到内容';
+    return;
   }
+  const diaries=getDiaries();
+  const now=fmtTime();
+  segments.forEach(seg=>{
+    diaries.unshift({id:Date.now()+Math.random(),date:vdDiary,type:seg.type,content:seg.content,time:now});
+  });
   setDiaries(diaries);
-  $('#clipPreview').textContent='✅ 已自动分发 '+count+' 条日记到 '+vdDiary;
+  $('#clipPreview').textContent='✅ 已自动分发 '+segments.length+' 条日记到 '+vdDiary;
   $('#clipBtn').classList.add('pulse');
   setTimeout(()=>$('#clipBtn').classList.remove('pulse'),400);
   closeClipModal();
   renderDiaryList();
+  renderOverviewStatus();
   confetti();
 }
 
