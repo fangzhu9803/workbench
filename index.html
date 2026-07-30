@@ -26,7 +26,9 @@
   --c-pink:#fbcfe8;
   --c-lavender:#ddd6fe;
 }
-html,body{-webkit-tap-highlight-color:transparent;overflow:hidden;height:100%;}
+html,body{-webkit-tap-highlight-color:transparent;height:100%;}
+html{overflow:hidden;}
+body{overflow:auto;-webkit-overflow-scrolling:touch;}
 body{background:var(--c-bg);color:var(--c-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
 
 /* === 全局：纸质纹理叠加 === */
@@ -99,8 +101,8 @@ html,body::after{
   box-shadow:0 6px 24px rgba(95,108,80,.12);
 }
 
-.main-panel{padding-left:44px;height:100vh;min-height:100%;}
-.panel-section{animation:fade .25s ease;position:relative;min-height:100%;padding-bottom:60px;}
+.main-panel{padding-left:44px;height:100%;min-height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.panel-section{animation:fade .25s ease;position:relative;min-height:100%;padding-bottom:80px;}
 @keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 .card{position:relative;z-index:1;border-radius:22px;box-shadow:0 6px 24px rgba(22,101,52,.06);}
 .panel-header{position:relative;z-index:1;}
@@ -1537,7 +1539,7 @@ window.app={
 
 bindAll();switchPanel('overview');renderAll();setInterval(()=>renderAll(),60000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('sw.js?v=11').then(reg=>{
+  navigator.serviceWorker.register('sw.js?v=12').then(reg=>{
     // 检测到新SW立即激活
     if(reg.waiting){reg.waiting.postMessage('skipWaiting');}
     if(reg.installing){reg.installing.addEventListener('statechange',e=>{if(e.target.state==='installed'&&reg.waiting)reg.waiting.postMessage('skipWaiting');});}
