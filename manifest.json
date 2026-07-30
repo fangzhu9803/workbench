@@ -1,25 +1,11 @@
 {
   "name": "我的工作台",
   "short_name": "工作台",
-  "description": "个人每日工作台 - 打卡、运动、学习、日记、随笔",
-  "start_url": "./index.html",
+  "description": "个人日常打卡、运动、学习、日记、随笔管理工作台",
+  "start_url": "./",
   "display": "standalone",
+  "background_color": "#f4faf6",
+  "theme_color": "#e0f2ea",
   "orientation": "portrait",
-  "background_color": "#fefdfb",
-  "theme_color": "#f3e8ff",
-  "lang": "zh-CN",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+  "icons": []
 }
