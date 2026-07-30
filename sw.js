@@ -1,4 +1,4 @@
-const C = "workbench-v8-force-refresh";
+const C = "workbench-v10-deep";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 self.addEventListener("install", e => {
   self.skipWaiting();
@@ -15,7 +15,6 @@ self.addEventListener("activate", e => {
 });
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
-  // 对导航请求强制网络优先，避免缓存旧页面
   if (e.request.mode === "navigate") {
     e.respondWith(
       fetch(e.request, { cache: "no-store" })
