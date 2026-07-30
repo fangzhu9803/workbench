@@ -1,4 +1,4 @@
-const C = "workbench-v12-scroll";
+const C = "workbench-v13-rich";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 self.addEventListener("install", e => {
   self.skipWaiting();
