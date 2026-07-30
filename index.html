@@ -14,7 +14,7 @@
 :root{
   --c-bg:#f4faf6;
   --c-card:#ffffff;
-  --c-text:#5a5a72;
+  --c-text:#2d2d3a;
   --c-green-soft:#e8f5ee;
   --c-green:#86efac;
   --c-green-deep:#16a34a;
@@ -29,61 +29,119 @@
 html,body{-webkit-tap-highlight-color:transparent;overflow:hidden;height:100%;}
 body{background:var(--c-bg);color:var(--c-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
 
-/* === 总览：大块撞色底（浅低饱和） === */
+/* === 全局：纸质纹理叠加 === */
+html,body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.78;
+  /* 纸纹噪点 + 斑驳 */
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.72  0 0 0 0 0.68  0 0 0 0 0.58  0 0 0 0.32 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode:multiply;
+}
+
+/* === 总览：参考图1水彩笔刷——蓝/绿/黄/奶油色块，有机毛边 === */
 #panel-overview{
   position:relative;
-  background:
-    radial-gradient(circle at 50% 45%, #fff7d6 0%, #fffbe8 18%, transparent 38%),
-    radial-gradient(circle at 88% 88%, #ffe7d1 0%, #fff0e0 16%, transparent 34%),
-    radial-gradient(circle at 85% 12%, #ffe0ec 0%, #fff0f5 15%, transparent 32%),
-    radial-gradient(circle at 12% 12%, #d9ecff 0%, #eef5ff 16%, transparent 34%),
-    radial-gradient(circle at 12% 88%, #dcfce7 0%, #eefcef 16%, transparent 34%),
-    #fbfff7;
+  background:#faf5e8;
   min-height:100%;
+  overflow:hidden;
+}
+/* 多个水彩笔刷色块，小blur保留毛边 */
+#panel-overview::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    /* 蓝色块（天空，左上） */
+    radial-gradient(ellipse 320px 240px at 12% 15%, #9ecde0 0%, #b3dceb 35%, transparent 60%),
+    /* 绿色块（草地，中下偏右） */
+    radial-gradient(ellipse 360px 280px at 55% 78%, #a8d49a 0%, #b4d99c 35%, transparent 62%),
+    /* 深绿色块（左下草地） */
+    radial-gradient(ellipse 300px 240px at 10% 88%, #7eb867 0%, #8ec275 35%, transparent 60%),
+    /* 黄色块（中间明亮） */
+    radial-gradient(ellipse 340px 120px at 52% 50%, #d9ca5e 0%, #e3d97a 50%, transparent 72%);
+  filter:blur(1.5px) contrast(1.08);
+  opacity:.9;
+}
+/* 第二层水彩笔触——细条状，保留毛边 */
+#panel-overview::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 220px 55px at 60% 65%, #9ecf82 0%, transparent 68%),
+    radial-gradient(ellipse 260px 65px at 42% 70%, #c5d05a 0%, transparent 68%),
+    radial-gradient(ellipse 200px 50px at 55% 73%, #7eb867 0%, transparent 68%),
+    radial-gradient(ellipse 180px 48px at 25% 40%, #8ec5dc 0%, transparent 68%);
+  filter:blur(1px);
+  opacity:.8;
 }
 #panel-overview .card{
-  background:rgba(255,255,255,.82);
-  backdrop-filter:blur(8px);
+  background:rgba(255,253,247,.85);
+  backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 24px rgba(95,108,80,.12);
 }
 
-/* === 其余面板：浅绿磨砂渐变 === */
+/* === 其余面板：水彩纸纹底（柔和色块点缀） === */
 .panel-section:not(#panel-overview){
-  background:linear-gradient(165deg,#eef9f1 0%,#f2fbf5 35%,#e8f5ee 70%,#e0f2ea 100%);
+  position:relative;
+  background:#faf5e8;
+  min-height:100%;
+}
+.panel-section:not(#panel-overview)::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 280px 300px at 8% 92%, #d4c85e 0%, #e3d97a 35%, transparent 60%),
+    radial-gradient(ellipse 260px 280px at 90% 10%, #9ec5dc 0%, #b3dceb 35%, transparent 60%),
+    radial-gradient(ellipse 280px 300px at 92% 92%, #9ecf82 0%, #b4d99c 35%, transparent 60%);
+  filter:blur(1.5px);
+  opacity:.5;
 }
 .panel-section:not(#panel-overview) .card{
-  background:rgba(255,255,255,.7);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.8);
+  background:rgba(255,253,247,.85);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 6px 24px rgba(95,108,80,.12);
 }
 
-.main-panel{padding-left:44px;}
-.panel-section{animation:fade .25s ease;position:relative;min-height:100%;}
+.main-panel{padding-left:44px;height:100vh;min-height:100%;}
+.panel-section{animation:fade .25s ease;position:relative;min-height:100%;padding-bottom:60px;}
 @keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 .card{position:relative;z-index:1;border-radius:22px;box-shadow:0 6px 24px rgba(22,101,52,.06);}
 .panel-header{position:relative;z-index:1;}
 
 /* 创意打卡圆圈 */
-.check-circle{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);border:2.5px solid #e2e8f0;background:#fff;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.check-circle{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);border:2.5px solid #e2e8f0;background:#fff;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+/* 未完成时是白色泡泡，3D玻璃感 */
+.check-circle:not(.done){
+  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.7) 50%, rgba(241,245,249,.5) 100%);
+  box-shadow:inset 2px 2px 6px rgba(255,255,255,.9),inset -3px -3px 8px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.06);
+}
 .check-circle:active{transform:scale(.92);}
-.check-circle.done{transform:translateY(-4px) scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,.12);border-color:transparent;}
-.check-circle .check-emoji{font-size:26px;transition:transform .2s;}
+/* 已完成：保持彩色底色 + 玻璃光泽 */
+.check-circle.done{
+  transform:translateY(-4px) scale(1.05);
+  box-shadow:0 8px 22px rgba(0,0,0,.18),inset 3px 3px 8px rgba(255,255,255,.35),inset -3px -3px 8px rgba(0,0,0,.1);
+  border-color:transparent;
+}
+.check-circle .check-emoji{font-size:26px;transition:transform .2s;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1));}
 .check-circle.done .check-emoji{display:none;}
-.check-circle .check-done{font-size:24px;display:none;color:#fff;}
-.check-circle.done .check-done{display:block;}
+/* 已完成时不显示手绘图标——保持纯泡泡 */
+.check-circle .check-done{font-size:24px;display:none;}
+.check-circle.done .check-done{display:none;}
 .check-circle .check-label{font-size:10px;margin-top:2px;font-weight:600;}
+/* 已完成时标签白色（玻璃泡泡上的文字） */
+.check-circle.done .check-label{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.25);font-weight:700;}
+/* 未完成时暗色 */
+.check-circle:not(.done) .check-label{color:#334155;}
+/* 已完成：彩色渐变（玻璃底色） */
 .check-circle:nth-child(6n+1){border-color:#fecdd3;}
-.check-circle:nth-child(6n+1).done{background:linear-gradient(135deg,#fda4af,#fecdd3);}
+.check-circle:nth-child(6n+1).done{background:radial-gradient(circle at 35% 30%, #fb7185 0%, #f43f5e 60%, #be123c 100%);}
 .check-circle:nth-child(6n+2){border-color:#fed7aa;}
-.check-circle:nth-child(6n+2).done{background:linear-gradient(135deg,#fdba74,#fed7aa);}
+.check-circle:nth-child(6n+2).done{background:radial-gradient(circle at 35% 30%, #fdba74 0%, #fb923c 60%, #c2410c 100%);}
 .check-circle:nth-child(6n+3){border-color:#fde68a;}
-.check-circle:nth-child(6n+3).done{background:linear-gradient(135deg,#fde047,#fde68a);}
+.check-circle:nth-child(6n+3).done{background:radial-gradient(circle at 35% 30%, #fde047 0%, #facc15 60%, #a16207 100%);}
 .check-circle:nth-child(6n+4){border-color:#bbf7d0;}
-.check-circle:nth-child(6n+4).done{background:linear-gradient(135deg,#86efac,#bbf7d0);}
+.check-circle:nth-child(6n+4).done{background:radial-gradient(circle at 35% 30%, #86efac 0%, #4ade80 60%, #15803d 100%);}
 .check-circle:nth-child(6n+5){border-color:#a5f3fc;}
-.check-circle:nth-child(6n+5).done{background:linear-gradient(135deg,#7dd3fc,#a5f3fc);}
+.check-circle:nth-child(6n+5).done{background:radial-gradient(circle at 35% 30%, #7dd3fc 0%, #38bdf8 60%, #0369a1 100%);}
 .check-circle:nth-child(6n+6){border-color:#ddd6fe;}
-.check-circle:nth-child(6n+6).done{background:linear-gradient(135deg,#c4b5fd,#ddd6fe);}
+.check-circle:nth-child(6n+6).done{background:radial-gradient(circle at 35% 30%, #c4b5fd 0%, #a78bfa 60%, #5b21b6 100%);}
 .check-wave{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px;padding:8px 0;}
 .check-wave > .check-circle:nth-child(odd){transform:translateY(-4px) rotate(-1deg);}
 .check-wave > .check-circle:nth-child(even){transform:translateY(4px) rotate(1deg);}
@@ -97,12 +155,12 @@ body{background:var(--c-bg);color:var(--c-text);font-family:-apple-system,BlinkM
 .sticky-note.done{background:#f0fdf4;border-color:#bbf7d0;opacity:.7;}
 .sticky-note.done .sticky-label{text-decoration:line-through;color:#86efac;}
 .sticky-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%) rotate(-6deg);width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
-.sticky-label{font-size:14px;font-weight:600;color:#475569;line-height:1.4;}
+.sticky-label{font-size:14px;font-weight:600;color:#1e293b;line-height:1.4;}
 .sticky-note.done .sticky-icon svg path{fill:#86efac;}
 .sticky-del{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;background:#fef2f2;font-size:12px;opacity:.6;transition:all .15s;}
 .sticky-del:hover{opacity:1;background:#fecaca;}
 .sticky-add{display:flex;gap:8px;margin-top:12px;align-items:center;}
-.sticky-add input{flex:1;padding:10px 14px;border-radius:10px;border:1px dashed #fde68a;background:#fffdf5;font-size:14px;color:#475569;outline:none;transition:all .15s;}
+.sticky-add input{flex:1;padding:10px 14px;border-radius:10px;border:1px dashed #fde68a;background:#fffdf5;font-size:14px;color:#1e293b;outline:none;transition:all .15s;}
 .sticky-add input:focus{border-color:#fbbf24;border-style:solid;background:#fff;}
 .sticky-add button{padding:10px 18px;border-radius:10px;background:#fef3c7;color:#92400e;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;}
 .sticky-add button:hover{background:#fde68a;}
@@ -134,7 +192,7 @@ textarea{resize:none;}
 .diary-num{flex-shrink:0;width:36px;padding:10px 6px 10px 14px;font-size:14px;color:#86efac;font-weight:600;}
 .diary-tag{flex-shrink:0;padding:10px 4px;}
 .diary-tag span{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;}
-.diary-text{flex:1;padding:10px 14px 10px 6px;font-size:13px;color:#475569;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.diary-text{flex:1;padding:10px 14px 10px 6px;font-size:13px;color:#1e293b;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
 .diary-time{flex-shrink:0;padding:10px 14px 10px 4px;font-size:10px;color:#94a3b8;}
 
 /* 左侧Tab */
@@ -149,7 +207,7 @@ textarea{resize:none;}
 .side-tab:hover{background:#f0fdf4;transform:translateX(1px);}
 .side-tab span:first-child{font-size:13px;}
 
-.date-nav{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.date-nav{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid #cbd5e1;background:#fff;color:#334155;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .date-nav:hover{background:#f0fdf4;color:#16a34a;}
 
 .delete-btn{display:flex;opacity:.5;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;transition:all .15s;position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#ef4444;background:#fef2f2;}
@@ -206,11 +264,11 @@ textarea{resize:none;}
   <div id="panel-overview" class="panel-section p-5 max-w-2xl mx-auto">
     <div class="panel-header">
       <h2 class="text-xl font-bold text-amber-600 mb-1">今日总览</h2>
-      <p id="todayDateMain" class="text-sm text-slate-400 mb-4"></p>
+      <p id="todayDateMain" class="text-sm text-slate-600 mb-4"></p>
     </div>
     <div class="card p-4 mb-4" style="border-top:4px solid #fbbf24;">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium text-slate-500">完成度</span>
+        <span class="text-sm font-medium text-slate-700">完成度</span>
         <div class="flex items-center gap-2">
           <span class="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-500">🔥 <span id="streakDays">0</span>天</span>
           <span class="text-2xl font-bold text-amber-500" id="completionPctMain">0%</span>
@@ -241,8 +299,8 @@ textarea{resize:none;}
       <button class="date-nav" onclick="app.navCheck(1)">→</button>
       <button class="px-2 py-1 rounded-lg text-xs bg-rose-50 text-rose-400 border border-rose-100 font-medium" onclick="app.navCheckTo(todayStr())">今天</button>
     </div>
-    <div id="checkinHistoryHint" class="mb-2 text-xs text-slate-400"></div>
-    <div id="checkProgress" class="text-sm text-slate-400 mb-3"></div>
+    <div id="checkinHistoryHint" class="mb-2 text-xs text-slate-600"></div>
+    <div id="checkProgress" class="text-sm text-slate-600 mb-3"></div>
     <!-- 顶部浮动圆圈插件 -->
     <div id="checkGrid" class="check-wave"></div>
     <!-- 便签列表 -->
@@ -272,8 +330,8 @@ textarea{resize:none;}
       <button class="date-nav" onclick="app.navEx(1)">→</button>
       <button class="px-2 py-1 rounded-lg text-xs bg-green-50 text-green-500 border border-green-100 font-medium" onclick="app.navExTo(todayStr())">今天</button>
     </div>
-    <div id="exHistoryHint" class="mb-2 text-xs text-slate-400"></div>
-    <p class="text-xs text-slate-400 mb-3" id="exHint">可多选，一天可做多项运动</p>
+    <div id="exHistoryHint" class="mb-2 text-xs text-slate-600"></div>
+    <p class="text-xs text-slate-600 mb-3" id="exHint">可多选，一天可做多项运动</p>
     <div id="exTagList" class="flex flex-wrap gap-2 mb-4"></div>
     <div id="exDetailArea" class="space-y-3"></div>
     <div id="exRecordsArea" class="mt-3 space-y-2"></div>
@@ -289,7 +347,7 @@ textarea{resize:none;}
           <div class="flex items-center gap-2">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 12c0-5-4-8-8-8s-8 3-8 8" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" fill="#bbf7d0"/><path d="M12 4c-1 2-2 4-2 6 0 3 2 5 5 5" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" fill="#86efac"/><path d="M12 4c1 2 2 4 2 6" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 21h14" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1 3"/></svg>
             <h3 class="text-sm font-semibold text-green-600 whitespace-nowrap">体重月历</h3>
-            <span class="text-[10px] text-slate-400">点击任意日期可记录</span>
+            <span class="text-[10px] text-slate-600">点击任意日期可记录</span>
           </div>
           <div class="flex items-center gap-2">
             <button class="date-nav" onclick="app.navWeightMonth(-1)">←</button>
@@ -305,14 +363,14 @@ textarea{resize:none;}
         <!-- 日历底部正好展示在首页 -->
         <div id="weightCalBottom" class="mt-3 pt-3 border-t border-green-50">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs text-slate-400">选中日期</span>
+            <span class="text-xs text-slate-600">选中日期</span>
             <span id="weightCalSelDate" class="text-xs font-medium text-green-600"></span>
           </div>
           <div class="flex gap-2">
             <input id="weightInput" type="number" step="0.1" placeholder="输入体重 kg" class="flex-1 px-3 py-2 rounded-lg border border-green-100 text-sm focus:outline-none focus:border-green-300 bg-white">
             <button class="px-4 py-2 rounded-lg bg-green-100 text-green-600 text-sm font-medium hover:bg-green-200 transition" onclick="saveWeight()">记录</button>
           </div>
-          <div id="weightSelInfo" class="text-[10px] text-slate-400 mt-1"></div>
+          <div id="weightSelInfo" class="text-[10px] text-slate-600 mt-1"></div>
         </div>
       </div>
     </div>
@@ -323,7 +381,7 @@ textarea{resize:none;}
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-6 4 3 6-8 3 4" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="8" cy="12" r="1.5" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/><circle cx="12" cy="15" r="1.5" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.5"/><circle cx="18" cy="7" r="1.5" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/></svg>
           <h3 class="text-sm font-semibold text-green-600">体重趋势</h3>
         </div>
-        <div id="weightRangeDisplay" class="text-xs text-slate-400"></div>
+        <div id="weightRangeDisplay" class="text-xs text-slate-600"></div>
       </div>
       <div id="weightChart" style="width:100%;height:160px;"></div>
     </div>
@@ -335,6 +393,8 @@ textarea{resize:none;}
       <h2 class="text-xl font-bold text-amber-500">学习追踪</h2>
       <button class="setting-btn" id="studySettingBtn" onclick="toggleStudyMgmt()">⚙️</button>
     </div>
+    <!-- 学习项目管理（点齿轮展开，紧挨标题确保可见） -->
+    <div id="studyMgmtArea" class="mgmt-panel mb-3"></div>
     <div class="flex items-center gap-3 mb-4">
       <button class="date-nav" onclick="app.navStudy(-1)">←</button>
       <span id="studyDateDisplay" class="text-sm font-semibold text-amber-500"></span>
@@ -374,7 +434,7 @@ textarea{resize:none;}
         <div class="flex items-center gap-2">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#ca8a04" stroke-width="1.8" fill="#fffbeb"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#ca8a04" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="14" r="1.5" fill="#fbbf24"/><circle cx="12" cy="14" r="1.5" fill="#f472b6"/></svg>
           <h3 class="text-sm font-semibold text-amber-600 whitespace-nowrap">学习日历</h3>
-          <span class="text-[10px] text-slate-400">点击日期可标记</span>
+          <span class="text-[10px] text-slate-600">点击日期可标记</span>
         </div>
         <div class="flex items-center gap-2">
           <button class="date-nav" onclick="app.navStudyMonth(-1)">←</button>
@@ -384,7 +444,7 @@ textarea{resize:none;}
         </div>
       </div>
       <!-- 图例 -->
-      <div class="flex items-center gap-4 mb-2 text-[10px] text-slate-500">
+      <div class="flex items-center gap-4 mb-2 text-[10px] text-slate-700">
         <span class="flex items-center gap-1"><span class="cal-mark read"></span>有阅读</span>
         <span class="flex items-center gap-1"><span class="cal-mark duo"></span>多邻国</span>
       </div>
@@ -395,19 +455,17 @@ textarea{resize:none;}
       <!-- 日历底部 -->
       <div id="studyCalBottom" class="mt-3 pt-3 border-t border-amber-50">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-xs text-slate-400">选中日期</span>
+          <span class="text-xs text-slate-600">选中日期</span>
           <span id="studyCalSelDate" class="text-xs font-medium text-amber-600"></span>
         </div>
         <div class="flex gap-2 flex-wrap">
           <button id="studyCalReadBtn" class="px-3 py-2 rounded-lg bg-amber-50 text-amber-600 text-xs font-medium border border-amber-100 hover:bg-amber-100 transition" onclick="toggleStudyCalRead()">📖 标记阅读</button>
           <button id="studyCalDuoBtn" class="px-3 py-2 rounded-lg bg-pink-50 text-pink-500 text-xs font-medium border border-pink-100 hover:bg-pink-100 transition" onclick="toggleStudyCalDuo()">🦉 标记多邻国</button>
         </div>
-        <div id="studySelInfo" class="text-[10px] text-slate-400 mt-1"></div>
+        <div id="studySelInfo" class="text-[10px] text-slate-600 mt-1"></div>
       </div>
     </div>
     <div id="weekStudyStat" class="mt-4 text-sm text-amber-500 font-medium"></div>
-    <!-- 学习项目管理 -->
-    <div id="studyMgmtArea" class="mgmt-panel"></div>
   </div>
 
   <!-- 写日记 -->
@@ -427,7 +485,7 @@ textarea{resize:none;}
         <button class="date-nav" onclick="app.navDiary(1)">→</button>
         <button class="px-2 py-1 rounded-lg text-xs bg-violet-50 text-violet-400 border border-violet-100 font-medium" onclick="app.navDiaryTo(todayStr())">今天</button>
       </div>
-      <div id="diaryHistoryHint" class="mb-2 text-xs text-slate-400"></div>
+      <div id="diaryHistoryHint" class="mb-2 text-xs text-slate-600"></div>
       <div class="flex flex-wrap gap-2 mb-4">
         <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium tag-success" data-type="success">🎉 成功日记</button>
         <button class="diary-btn px-4 py-2 rounded-xl text-sm font-medium tag-gratitude" data-type="gratitude">🙏 感恩日记</button>
@@ -478,7 +536,7 @@ textarea{resize:none;}
         <button class="date-nav" onclick="app.navNotes(1)">→</button>
         <button class="px-2 py-1 rounded-lg text-xs bg-sky-50 text-sky-400 border border-sky-100 font-medium" onclick="app.navNotesTo(todayStr())">今天</button>
       </div>
-      <div id="notesHistoryHint" class="mb-2 text-xs text-slate-400"></div>
+      <div id="notesHistoryHint" class="mb-2 text-xs text-slate-600"></div>
       <div class="card p-4 mb-4" style="border-top:4px solid #7dd3fc;">
         <textarea id="notesContent" rows="3" placeholder="随手记录灵感、金句、想法..." class="w-full px-3 py-2 rounded-lg border border-sky-100 text-sm focus:outline-none focus:border-sky-300 bg-white"></textarea>
         <div class="flex gap-2 mt-2">
@@ -566,11 +624,11 @@ textarea{resize:none;}
   <div class="card w-full max-w-md p-5" style="border-top:4px solid #c4b5fd;">
     <div class="flex items-center justify-between mb-3">
       <h3 id="diaryModalTitle" class="text-base font-bold text-violet-500">写日记</h3>
-      <button id="closeDiaryModal" class="text-slate-400 hover:text-slate-600 text-xl">×</button>
+      <button id="closeDiaryModal" class="text-slate-600 hover:text-slate-600 text-xl">×</button>
     </div>
     <textarea id="diaryContent" rows="6" placeholder="写下你的想法..." class="w-full px-3 py-2 rounded-lg border border-violet-100 text-sm focus:outline-none focus:border-violet-300 mb-3 bg-white"></textarea>
     <div class="flex justify-end gap-2">
-      <button id="cancelDiary" class="px-4 py-2 rounded-lg bg-slate-50 text-slate-500 text-sm font-medium border border-slate-100">取消</button>
+      <button id="cancelDiary" class="px-4 py-2 rounded-lg bg-slate-50 text-slate-700 text-sm font-medium border border-slate-100">取消</button>
       <button id="saveDiary" class="px-4 py-2 rounded-lg bg-violet-100 text-violet-500 text-sm font-medium hover:bg-violet-200 transition">保存</button>
     </div>
   </div>
@@ -606,6 +664,8 @@ const DEFAULT_STUDY_ITEMS=[
   {key:'reading',label:'阅读',emoji:'📖'},
   {key:'duolingo',label:'多邻国',emoji:'🦉'}
 ];
+
+// 已完成态为纯3D泡泡，无需图标
 
 let vdCheck=todayStr(),vdEx=todayStr(),vdStudy=todayStr(),vdDiary=todayStr(),vdNotes=todayStr(),vdHist=todayStr();
 let vdDiaryWeek=todayStr(),vdDiaryMonth=todayStr(),vdNotesWeek=todayStr(),vdNotesMonth=todayStr();
@@ -656,7 +716,7 @@ function renderStickies(){
     html+=`</div>`;
   });
   if(list.length===0){
-    html='<p class="text-center text-sm text-slate-400 py-4">还没有便签，添加一条待办吧～</p>';
+    html='<p class="text-center text-sm text-slate-600 py-4">还没有便签，添加一条待办吧～</p>';
   }
   $('#stickyList').innerHTML=html;
 }
@@ -682,7 +742,7 @@ function renderCheck(){
   let grid='';
   items.forEach(item=>{
     const done=checks[item.key];
-    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${vdCheck}','${item.key}');renderAll();"><div class="check-emoji">${item.emoji}</div><div class="check-done">✓</div><div class="check-label ${done?'text-white':'text-slate-400'}">${item.label}</div></div>`;
+    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${vdCheck}','${item.key}');renderAll();"><div class="check-emoji">${item.emoji}</div><div class="check-label ${done?'text-white':'text-slate-600'}">${item.label}</div></div>`;
   });
   $('#checkGrid').innerHTML=grid;
   renderStickies();
@@ -714,7 +774,7 @@ function renderExMgmt(){
   let mgmt='<div class="card p-4"><div class="flex items-center justify-between mb-3"><span class="text-sm font-medium text-slate-600">管理运动项</span></div>';
   types.forEach(item=>{mgmt+=`<div class="item-row"><div class="flex items-center gap-2"><span class="text-lg">${item.emoji}</span><span class="text-sm text-slate-600">${item.label}</span></div><div class="delete-btn-small" onclick="deleteExType('${item.key}')">🗑</div></div>`;});
   mgmt+='<div class="flex gap-2 mt-3"><input id="newExEmoji" type="text" placeholder="🎯" maxlength="2" class="w-12 px-2 py-2 text-center rounded-lg border border-slate-200 text-sm"><input id="newExLabel" type="text" placeholder="运动项名称（如：跑步）" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm"><button class="px-4 py-2 rounded-lg bg-green-100 text-green-500 text-sm font-medium hover:bg-green-200 transition" onclick="addExType()">添加</button></div>';
-  mgmt+='<p class="text-xs text-slate-400 mt-2">新增运动项默认包含"时长"字段</p></div>';
+  mgmt+='<p class="text-xs text-slate-600 mt-2">新增运动项默认包含"时长"字段</p></div>';
   $('#exMgmtArea').innerHTML=mgmt;
 }
 function renderExercise(){
@@ -729,8 +789,8 @@ function renderExercise(){
     if(e.done)return;
     const t=findExType(e.type);
     let fields=`<div class="card p-3" style="border-left:4px solid #86efac;"><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-green-600">${t.emoji} ${t.label}</span><button class="text-xs text-red-400 hover:text-red-600" onclick="app.cancelEx('${vdEx}',${idx})">取消</button></div>`;
-    if(t.fields.length===0){fields+='<p class="text-xs text-slate-400">休息日，好好放松～</p>';}
-    else{t.fields.forEach(f=>{const val=e.detail[f.key]??f.default;fields+=`<div class="mb-2"><div class="flex justify-between text-xs text-slate-500 mb-1"><span>${f.label}</span><span id="exv_${idx}_${f.key}">${val}${f.unit}</span></div>`;if(f.type==='range')fields+=`<input type="range" id="exf_${idx}_${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${val}" class="w-full" oninput="$('#exv_${idx}_${f.key}').textContent=this.value+'${f.unit}'">`;else fields+=`<input type="number" id="exf_${idx}_${f.key}" value="${val}" min="${f.min}" max="${f.max}" step="${f.step}" class="w-full px-2 py-1 rounded border border-slate-200 text-sm">`;fields+='</div>';});}
+    if(t.fields.length===0){fields+='<p class="text-xs text-slate-600">休息日，好好放松～</p>';}
+    else{t.fields.forEach(f=>{const val=e.detail[f.key]??f.default;fields+=`<div class="mb-2"><div class="flex justify-between text-xs text-slate-700 mb-1"><span>${f.label}</span><span id="exv_${idx}_${f.key}">${val}${f.unit}</span></div>`;if(f.type==='range')fields+=`<input type="range" id="exf_${idx}_${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${val}" class="w-full" oninput="$('#exv_${idx}_${f.key}').textContent=this.value+'${f.unit}'">`;else fields+=`<input type="number" id="exf_${idx}_${f.key}" value="${val}" min="${f.min}" max="${f.max}" step="${f.step}" class="w-full px-2 py-1 rounded border border-slate-200 text-sm">`;fields+='</div>';});}
     fields+=`<button class="w-full py-2 rounded-lg bg-green-100 text-green-600 text-sm font-medium hover:bg-green-200 transition" onclick="app.completeEx('${vdEx}',${idx})">完成 ✓</button></div>`;
     details+=fields;
   });
@@ -827,7 +887,7 @@ function renderWeightChart(){
     rangeEl.textContent='近30天';
   }
   if(points.length===0){
-    container.innerHTML='<div class="flex items-center justify-center h-full text-xs text-slate-400">暂无记录，开始记录体重后会显示趋势图</div>';
+    container.innerHTML='<div class="flex items-center justify-center h-full text-xs text-slate-600">暂无记录，开始记录体重后会显示趋势图</div>';
     return;
   }
   let W=container.clientWidth;
@@ -920,7 +980,7 @@ function renderStudyMgmt(){
   let mgmt='<div class="card p-4"><div class="flex items-center justify-between mb-3"><span class="text-sm font-medium text-slate-600">管理学习项目</span></div>';
   items.forEach(item=>{mgmt+=`<div class="item-row"><div class="flex items-center gap-2"><span class="text-lg">${item.emoji}</span><span class="text-sm text-slate-600">${item.label}</span></div><div class="delete-btn-small" onclick="deleteStudyItem('${item.key}')">🗑</div></div>`;});
   mgmt+='<div class="flex gap-2 mt-3"><input id="newStudyEmoji" type="text" placeholder="🎯" maxlength="2" class="w-12 px-2 py-2 text-center rounded-lg border border-slate-200 text-sm"><input id="newStudyLabel" type="text" placeholder="学习项目名称" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm"><button class="px-4 py-2 rounded-lg bg-amber-100 text-amber-500 text-sm font-medium hover:bg-amber-200 transition" onclick="addStudyItem()">添加</button></div>';
-  mgmt+='<p class="text-xs text-slate-400 mt-2">学习项目会出现在日历标记中</p></div>';
+  mgmt+='<p class="text-xs text-slate-600 mt-2">学习项目会出现在日历标记中</p></div>';
   $('#studyMgmtArea').innerHTML=mgmt;
 }
 function addStudyItem(){const emoji=$('#newStudyEmoji').value.trim()||'🎯';const label=$('#newStudyLabel').value.trim();if(!label)return;const items=getStudyItems();items.push({key:'s'+Date.now(),label,emoji});setStudyItems(items);$('#newStudyEmoji').value='';$('#newStudyLabel').value='';renderStudyMgmt();}
@@ -1004,7 +1064,7 @@ function renderStudy(){
   const books=getBooks();
   let readingHtml='';
   const reading=books.filter(b=>b.status==='reading');
-  if(reading.length===0)readingHtml='<p class="text-center text-sm text-slate-400 py-6">还没有在读的书，添加一本开始记录吧～</p>';
+  if(reading.length===0)readingHtml='<p class="text-center text-sm text-slate-600 py-6">还没有在读的书，添加一本开始记录吧～</p>';
   else{
     reading.forEach(b=>{
       readingHtml+=`<div class="book-card"><div class="flex items-center justify-between"><div><div class="book-title">${escapeHtml(b.name)}</div><div class="book-min">已读 ${b.minutes||0} 分钟</div></div><div class="flex items-center gap-1"><div class="delete-btn-small" onclick="deleteBook(${b.id})">🗑</div></div></div>`;
@@ -1014,9 +1074,9 @@ function renderStudy(){
   $('#bookReadingArea').innerHTML=readingHtml;
   let finishedHtml='';
   const finished=books.filter(b=>b.status==='finished');
-  if(finished.length===0)finishedHtml='<p class="text-center text-sm text-slate-400 py-6">还没有读完的书，继续加油～</p>';
+  if(finished.length===0)finishedHtml='<p class="text-center text-sm text-slate-600 py-6">还没有读完的书，继续加油～</p>';
   else{
-    finishedHtml+='<div class="flex items-center justify-between mb-2"><span class="text-xs font-medium text-slate-500">共 '+finished.length+' 本</span></div>';
+    finishedHtml+='<div class="flex items-center justify-between mb-2"><span class="text-xs font-medium text-slate-700">共 '+finished.length+' 本</span></div>';
     finished.forEach(b=>{finishedHtml+=`<div class="book-card book-done"><div class="flex items-center justify-between"><div><div class="book-title">${escapeHtml(b.name)}</div><div class="book-min">累计 ${b.minutes||0} 分钟</div></div><div class="flex items-center gap-2"><span class="text-xs text-green-600 font-medium">✓ 已读完</span><div class="delete-btn-small" onclick="deleteBook(${b.id})">🗑</div></div></div><button class="mt-2 w-full py-1 rounded-lg bg-green-50 text-green-600 text-xs font-medium border border-green-100" onclick="toggleBookStatus(${b.id})">标记为在读</button></div>`;});
   }
   $('#bookFinishedArea').innerHTML=finishedHtml;
@@ -1074,7 +1134,7 @@ function renderDiaryList(){
   const diaries=getDiaries().filter(d=>d.date===vdDiary);
   const filtered=diaryFilter==='all'?diaries:diaries.filter(d=>d.type===diaryFilter);
   $('#diaryHistoryHint').textContent=vdDiary===todayStr()?'':(diaries.length?'当日 '+diaries.length+' 条':'当日无日记');
-  if(filtered.length===0){$('#diaryList').innerHTML='<p class="text-center text-sm text-slate-400 py-8">还没有日记，点击上方按钮开始记录吧～</p>';return;}
+  if(filtered.length===0){$('#diaryList').innerHTML='<p class="text-center text-sm text-slate-600 py-8">还没有日记，点击上方按钮开始记录吧～</p>';return;}
   let html='';
   filtered.forEach(d=>{const t=DIARY_TYPES[d.type];html+=`<div class="diary-line"><div class="diary-num">${diaries.indexOf(d)+1}</div><div class="diary-tag"><span class="${t.cls}">${t.emoji}</span></div><div class="diary-text">${escapeHtml(d.content)}</div><div class="diary-time">${d.time}</div><div class="delete-btn" onclick="app.deleteDiaryItem(${d.id})">🗑</div></div>`;});
   $('#diaryList').innerHTML=html;
@@ -1090,8 +1150,8 @@ function renderDiaryWeekStat(){
   Object.keys(DIARY_TYPES).forEach(tk=>{
     const t=DIARY_TYPES[tk];
     const items=allDiaries.filter(d=>d.type===tk&&days.includes(d.date));
-    html+=`<div class="mb-4"><div class="flex justify-between items-center mb-2"><span class="text-xs font-medium text-slate-500">${t.emoji} ${t.label}</span><span class="text-xs font-medium ${items.length>0?'text-violet-500':'text-slate-300'}">${items.length} 条</span></div>`;
-    if(items.length===0)html+='<p class="text-xs text-slate-400 pl-2">本周无记录</p>';
+    html+=`<div class="mb-4"><div class="flex justify-between items-center mb-2"><span class="text-xs font-medium text-slate-700">${t.emoji} ${t.label}</span><span class="text-xs font-medium ${items.length>0?'text-violet-500':'text-slate-500'}">${items.length} 条</span></div>`;
+    if(items.length===0)html+='<p class="text-xs text-slate-600 pl-2">本周无记录</p>';
     else items.forEach(d=>{const dd=new Date(d.date+'T00:00:00');html+=`<div class="notes-item mb-1.5"><div class="notes-text">${escapeHtml(d.content)}</div><div class="notes-meta"><span>📅 ${dd.getMonth()+1}/${dd.getDate()} ${d.time}</span><span class="${t.cls}" style="font-size:10px;padding:2px 6px;border-radius:4px;">${t.emoji} ${t.label}</span></div></div>`;});
     html+='</div>';
   });
@@ -1106,8 +1166,8 @@ function renderDiaryMonthStat(){
   let html='<div class="card p-4" style="border-top:4px solid #c4b5fd;"><h3 class="text-sm font-semibold text-violet-500 mb-3">📊 本月日记</h3>';
   Object.keys(DIARY_TYPES).forEach(tk=>{
     const t=DIARY_TYPES[tk];const items=allDiaries.filter(d=>d.type===tk&&monthDates.includes(d.date));
-    html+=`<div class="mb-4"><div class="flex justify-between items-center mb-2"><span class="text-xs font-medium text-slate-500">${t.emoji} ${t.label}</span><span class="text-xs font-medium ${items.length>0?'text-violet-500':'text-slate-300'}">${items.length} 条</span></div>`;
-    if(items.length===0)html+='<p class="text-xs text-slate-400 pl-2">本月无记录</p>';
+    html+=`<div class="mb-4"><div class="flex justify-between items-center mb-2"><span class="text-xs font-medium text-slate-700">${t.emoji} ${t.label}</span><span class="text-xs font-medium ${items.length>0?'text-violet-500':'text-slate-500'}">${items.length} 条</span></div>`;
+    if(items.length===0)html+='<p class="text-xs text-slate-600 pl-2">本月无记录</p>';
     else items.forEach(d=>{const dd=new Date(d.date+'T00:00:00');html+=`<div class="notes-item mb-1.5"><div class="notes-text">${escapeHtml(d.content)}</div><div class="notes-meta"><span>📅 ${dd.getMonth()+1}/${dd.getDate()} ${d.time}</span><span class="${t.cls}" style="font-size:10px;padding:2px 6px;border-radius:4px;">${t.emoji} ${t.label}</span></div></div>`;});
     html+='</div>';
   });
@@ -1136,7 +1196,7 @@ function renderNotes(){
   $('#notesDateDisplay').textContent=fmtDate(vdNotes);
   const notes=getNotes().filter(n=>n.date===vdNotes);
   $('#notesHistoryHint').textContent=vdNotes===todayStr()?'':(notes.length?'当日 '+notes.length+' 条':'当日无随笔');
-  if(notes.length===0){$('#notesList').innerHTML='<p class="text-center text-sm text-slate-400 py-8">还没有随笔，开始记录灵感吧～</p>';return;}
+  if(notes.length===0){$('#notesList').innerHTML='<p class="text-center text-sm text-slate-600 py-8">还没有随笔，开始记录灵感吧～</p>';return;}
   let html='';
   notes.forEach(n=>{html+=`<div class="notes-item"><div class="notes-text">${escapeHtml(n.content)}</div><div class="notes-meta"><span>⏰ ${n.time}</span></div><div class="delete-btn" onclick="app.deleteNotesItem(${n.id})">🗑</div></div>`;});
   $('#notesList').innerHTML=html;
@@ -1148,8 +1208,8 @@ function renderNotesWeekStat(){
   $('#notesWeekDisplay').textContent=(m.getMonth()+1)+'/'+m.getDate()+'(周'+w[m.getDay()]+') ~ '+(s.getMonth()+1)+'/'+s.getDate()+'(周'+w[s.getDay()]+')';
   const days=[];for(let i=0;i<7;i++)days.push(dateOffset(mon,i));
   const items=getNotes().filter(n=>days.includes(n.date));
-  let html='<div class="card p-4" style="border-top:4px solid #7dd3fc;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-sky-500">📊 本周随笔</h3><span class="text-xs font-medium '+(items.length>0?'text-sky-500':'text-slate-300')+'">'+items.length+' 条</span></div>';
-  if(items.length===0)html+='<p class="text-center text-sm text-slate-400 py-6">本周暂无随笔</p>';
+  let html='<div class="card p-4" style="border-top:4px solid #7dd3fc;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-sky-500">📊 本周随笔</h3><span class="text-xs font-medium '+(items.length>0?'text-sky-500':'text-slate-500')+'">'+items.length+' 条</span></div>';
+  if(items.length===0)html+='<p class="text-center text-sm text-slate-600 py-6">本周暂无随笔</p>';
   else items.forEach(n=>{const dd=new Date(n.date+'T00:00:00');html+=`<div class="notes-item mb-2"><div class="notes-text">${escapeHtml(n.content)}</div><div class="notes-meta"><span>📅 ${dd.getMonth()+1}/${dd.getDate()} 周${w[dd.getDay()]} ${n.time}</span></div></div>`;});
   html+='</div>';
   $('#notesWeekContent').innerHTML=html;
@@ -1159,8 +1219,8 @@ function renderNotesMonthStat(){
   $('#notesMonthDisplay').textContent=y+'年'+(m+1)+'月';
   let monthDates=[];const daysInMonth=new Date(y,m+1,0).getDate();for(let day=1;day<=daysInMonth;day++)monthDates.push(y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0'));
   const items=getNotes().filter(n=>monthDates.includes(n.date));
-  let html='<div class="card p-4" style="border-top:4px solid #7dd3fc;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-sky-500">📊 本月随笔</h3><span class="text-xs font-medium '+(items.length>0?'text-sky-500':'text-slate-300')+'">'+items.length+' 条</span></div>';
-  if(items.length===0)html+='<p class="text-center text-sm text-slate-400 py-6">本月暂无随笔</p>';
+  let html='<div class="card p-4" style="border-top:4px solid #7dd3fc;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-sky-500">📊 本月随笔</h3><span class="text-xs font-medium '+(items.length>0?'text-sky-500':'text-slate-500')+'">'+items.length+' 条</span></div>';
+  if(items.length===0)html+='<p class="text-center text-sm text-slate-600 py-6">本月暂无随笔</p>';
   else items.forEach(n=>{const dd=new Date(n.date+'T00:00:00');html+=`<div class="notes-item mb-2"><div class="notes-text">${escapeHtml(n.content)}</div><div class="notes-meta"><span>📅 ${dd.getMonth()+1}/${dd.getDate()} ${n.time}</span></div></div>`;});
   html+='</div>';
   $('#notesMonthContent').innerHTML=html;
@@ -1191,25 +1251,25 @@ function renderHistory(){
   let html='';
   html+='<div class="card p-4" style="border-top:4px solid #fda4af;"><h3 class="text-sm font-semibold text-rose-500 mb-3">✅ 待办</h3>';
   const items=getCheckItems();
-  if(Object.keys(checks).length===0)html+='<p class="text-xs text-slate-400">无记录</p>';
+  if(Object.keys(checks).length===0)html+='<p class="text-xs text-slate-600">无记录</p>';
   else items.forEach(item=>{if(checks[item.key]!==undefined)html+=`<div class="flex items-center gap-2 text-sm py-1"><span>${checks[item.key]?'✓':'○'}</span><span>${item.emoji} ${item.label}</span></div>`;});
   html+='</div>';
   html+='<div class="card p-4" style="border-top:4px solid #86efac;"><h3 class="text-sm font-semibold text-green-600 mb-3">🏃 运动</h3>';
-  if(ex.length===0)html+='<p class="text-xs text-slate-400">无记录</p>';
+  if(ex.length===0)html+='<p class="text-xs text-slate-600">无记录</p>';
   else ex.forEach(e=>{if(!e.done)return;const t=findExType(e.type);let txt=t.emoji+' '+t.label;if(t.fields.length>0)txt+='：'+t.fields.map(f=>e.detail[f.key]+f.unit).join(' / ');html+=`<div class="text-sm text-green-700 py-1">${txt}</div>`;});
   html+='</div>';
   html+='<div class="card p-4" style="border-top:4px solid #fbbf24;"><h3 class="text-sm font-semibold text-amber-500 mb-3">📖 学习</h3>';
   if(read>0)html+=`<div class="text-sm text-amber-700 py-1">📖 阅读 ${read} 分钟</div>`;
   if(duo)html+=`<div class="text-sm text-pink-600 py-1">🦉 多邻国已完成</div>`;
-  if(read===0&&!duo)html+='<p class="text-xs text-slate-400">无记录</p>';
+  if(read===0&&!duo)html+='<p class="text-xs text-slate-600">无记录</p>';
   html+='</div>';
   html+='<div class="card p-4" style="border-top:4px solid #c4b5fd;"><h3 class="text-sm font-semibold text-violet-500 mb-3">✍️ 日记</h3>';
-  if(diaries.length===0)html+='<p class="text-xs text-slate-400">无记录</p>';
-  else diaries.forEach(d=>{const t=DIARY_TYPES[d.type];html+=`<div class="mb-2 pb-2 border-b border-slate-50 last:border-0"><span class="${t.cls}" style="font-size:10px;padding:2px 6px;border-radius:4px;">${t.emoji} ${t.label}</span><p class="text-sm text-slate-600 mt-1 whitespace-pre-wrap">${escapeHtml(d.content)}</p><p class="text-xs text-slate-400 mt-1">${d.time}</p></div>`;});
+  if(diaries.length===0)html+='<p class="text-xs text-slate-600">无记录</p>';
+  else diaries.forEach(d=>{const t=DIARY_TYPES[d.type];html+=`<div class="mb-2 pb-2 border-b border-slate-50 last:border-0"><span class="${t.cls}" style="font-size:10px;padding:2px 6px;border-radius:4px;">${t.emoji} ${t.label}</span><p class="text-sm text-slate-600 mt-1 whitespace-pre-wrap">${escapeHtml(d.content)}</p><p class="text-xs text-slate-600 mt-1">${d.time}</p></div>`;});
   html+='</div>';
   html+='<div class="card p-4" style="border-top:4px solid #7dd3fc;"><h3 class="text-sm font-semibold text-sky-500 mb-3">📝 随笔</h3>';
-  if(notes.length===0)html+='<p class="text-xs text-slate-400">无记录</p>';
-  else notes.forEach(n=>{html+=`<div class="mb-2 pb-2 border-b border-slate-50 last:border-0"><p class="text-sm text-slate-600 whitespace-pre-wrap">${escapeHtml(n.content)}</p><p class="text-xs text-slate-400 mt-1">${n.time}</p></div>`;});
+  if(notes.length===0)html+='<p class="text-xs text-slate-600">无记录</p>';
+  else notes.forEach(n=>{html+=`<div class="mb-2 pb-2 border-b border-slate-50 last:border-0"><p class="text-sm text-slate-600 whitespace-pre-wrap">${escapeHtml(n.content)}</p><p class="text-xs text-slate-600 mt-1">${n.time}</p></div>`;});
   html+='</div>';
   $('#historyContent').innerHTML=html;
 }
@@ -1227,10 +1287,10 @@ function renderWeekStat(){
   days.forEach(d=>{const cr=checkRecords[d]||{};checkItems.forEach(i=>{if(cr[i.key])checkCount[i.key]++;});const er=(exRecords[d]||[]).filter(e=>e.done);er.forEach(e=>{if(exCount[e.type]!==undefined)exCount[e.type]++;});totalRead+=readRecords[d]||0;if(duoRecords[d])totalDuo++;});
   let html='<div class="card p-4" style="border-top:4px solid #c4b5fd;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-violet-500">📊 本周统计</h3></div>';
   html+='<div class="mb-3"><p class="text-xs font-medium text-rose-500 mb-2">每日待办</p>';
-  checkItems.forEach(i=>{const c=checkCount[i.key]||0;const bar=c>0?Math.round(c/7*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=7?'text-green-500':c>0?'text-violet-500':'text-slate-300'}">${c}/7 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=7?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;});
+  checkItems.forEach(i=>{const c=checkCount[i.key]||0;const bar=c>0?Math.round(c/7*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=7?'text-green-500':c>0?'text-violet-500':'text-slate-500'}">${c}/7 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=7?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;});
   html+='</div>';
   html+='<div class="mb-3"><p class="text-xs font-medium text-green-600 mb-2">运动</p>';
-  exTypes.forEach(i=>{const c=exCount[i.key]||0;const bar=c>0?Math.round(c/7*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-300'}">${c} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full bg-green-400" style="width:${bar}%"></div></div></div>`;});
+  exTypes.forEach(i=>{const c=exCount[i.key]||0;const bar=c>0?Math.round(c/7*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-500'}">${c} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full bg-green-400" style="width:${bar}%"></div></div></div>`;});
   html+='</div>';
   html+='<div><p class="text-xs font-medium text-amber-500 mb-2">学习</p>';
   html+=`<div class="flex justify-between items-center text-xs py-1"><span>📖 阅读</span><span class="font-medium text-amber-600">${totalRead} 分钟</span></div>`;
@@ -1248,12 +1308,12 @@ function renderMonthStat(){
   const exCount={};exTypes.forEach(i=>exCount[i.key]=0);
   let totalRead=0,totalDuo=0;
   for(let day=1;day<=daysInMonth;day++){const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');const cr=checkRecords[ds]||{};checkItems.forEach(i=>{if(cr[i.key])checkCount[i.key]++;});const er=(exRecords[ds]||[]).filter(e=>e.done);er.forEach(e=>{if(exCount[e.type]!==undefined)exCount[e.type]++;});totalRead+=readRecords[ds]||0;if(duoRecords[ds])totalDuo++;}
-  let html='<div class="card p-4" style="border-top:4px solid #c4b5fd;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-violet-500">📅 本月统计</h3><span class="text-xs text-slate-400">共'+daysInMonth+'天</span></div>';
+  let html='<div class="card p-4" style="border-top:4px solid #c4b5fd;"><div class="flex items-center justify-between mb-3"><h3 class="text-sm font-semibold text-violet-500">📅 本月统计</h3><span class="text-xs text-slate-600">共'+daysInMonth+'天</span></div>';
   html+='<div class="mb-3"><p class="text-xs font-medium text-rose-500 mb-2">每日待办</p>';
-  checkItems.forEach(i=>{const c=checkCount[i.key]||0;const bar=c>0?Math.round(c/daysInMonth*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=daysInMonth?'text-green-500':c>0?'text-violet-500':'text-slate-300'}">${c}/${daysInMonth} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=daysInMonth?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;});
+  checkItems.forEach(i=>{const c=checkCount[i.key]||0;const bar=c>0?Math.round(c/daysInMonth*100):0;html+=`<div class="mb-2"><div class="flex justify-between items-center text-xs mb-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>=daysInMonth?'text-green-500':c>0?'text-violet-500':'text-slate-500'}">${c}/${daysInMonth} 次</span></div><div class="progress-track h-1.5 rounded-full overflow-hidden"><div class="h-full rounded-full ${c>=daysInMonth?'bg-green-400':'bg-violet-400'}" style="width:${bar}%"></div></div></div>`;});
   html+='</div>';
   html+='<div class="mb-3"><p class="text-xs font-medium text-green-600 mb-2">运动</p>';
-  exTypes.forEach(i=>{const c=exCount[i.key]||0;html+=`<div class="flex justify-between items-center text-xs py-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-300'}">${c} 次</span></div>`;});
+  exTypes.forEach(i=>{const c=exCount[i.key]||0;html+=`<div class="flex justify-between items-center text-xs py-1"><span>${i.emoji} ${i.label}</span><span class="font-medium ${c>0?'text-green-500':'text-slate-500'}">${c} 次</span></div>`;});
   html+='</div>';
   html+='<div><p class="text-xs font-medium text-amber-500 mb-2">学习</p>';
   html+=`<div class="flex justify-between items-center text-xs py-1"><span>📖 阅读</span><span class="font-medium text-amber-600">${totalRead} 分钟</span></div>`;
@@ -1306,7 +1366,7 @@ function renderQuickCheck(){
   let grid='';
   items.forEach(item=>{
     const done=checks[item.key];
-    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${todayStr()}','${item.key}');renderAll();"><div class="check-emoji">${item.emoji}</div><div class="check-done">✓</div><div class="check-label ${done?'text-white':'text-slate-400'}">${item.label}</div></div>`;
+    grid+=`<div class="check-circle ${done?'done':''}" onclick="toggleCheck('${todayStr()}','${item.key}');renderAll();"><div class="check-emoji">${item.emoji}</div><div class="check-label ${done?'text-white':'text-slate-600'}">${item.label}</div></div>`;
   });
   $('#quickCheckGrid').innerHTML=grid;
 }
@@ -1319,7 +1379,7 @@ function renderOverviewStatus(){
   const checkDone=items.filter(i=>checks[i.key]).length;
   if(checkDone===items.length&&items.length>0)sl.push('<div class="flex items-center gap-1.5 text-green-600"><span>✓</span> 待办全部完成</div>');
   else if(checkDone>0)sl.push('<div class="flex items-center gap-1.5 text-rose-400"><span>◐</span> 待办 '+checkDone+'/'+items.length+'</div>');
-  else sl.push('<div class="flex items-center gap-1.5 text-slate-400"><span>○</span> 待办未开始</div>');
+  else sl.push('<div class="flex items-center gap-1.5 text-slate-600"><span>○</span> 待办未开始</div>');
   if(ex.length>0){const exTxt=ex.map(e=>{const t=findExType(e.type);return t.emoji+t.label;}).join(' ');sl.push('<div class="flex items-center gap-1.5 text-green-600"><span>✓</span> 运动：'+exTxt+'</div>');}
   else sl.push('<div class="flex items-center gap-1.5 text-green-300"><span>○</span> 运动未开始</div>');
   if(read>0)sl.push('<div class="flex items-center gap-1.5 text-amber-600"><span>✓</span> 阅读'+read+'分钟</div>');
@@ -1477,7 +1537,7 @@ window.app={
 
 bindAll();switchPanel('overview');renderAll();setInterval(()=>renderAll(),60000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('sw.js?v=8').then(reg=>{
+  navigator.serviceWorker.register('sw.js?v=10').then(reg=>{
     // 检测到新SW立即激活
     if(reg.waiting){reg.waiting.postMessage('skipWaiting');}
     if(reg.installing){reg.installing.addEventListener('statechange',e=>{if(e.target.state==='installed'&&reg.waiting)reg.waiting.postMessage('skipWaiting');});}
